@@ -1,0 +1,13 @@
+.env
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.git
+.gitignore
+logs/
+data/failed_jobs/
+*.md
+tests/
+Datasheet_example/
+Receipt_example/

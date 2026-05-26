@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtualenv
+venv/
+.venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+pytest-cache-files-*/
+
+# Runtime / secrets — NEVER commit these
+.env
+.env.local
+.env.production
+.env.*.local
+*secrets*
+*secret*
+
+# LLM API key protection
+# OPENROUTER_API_KEY must never be committed.
+# Always use docker-compose.yml environment variables or
+# a local .env file (which is gitignored above).
+# Safe to commit: .env.example (it contains no real keys)
+
+# Logs and failed jobs (runtime data, not source)
+logs/
+data/failed_jobs/
+
+# Keep empty directories in git
+!logs/.gitkeep
+!data/failed_jobs/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
