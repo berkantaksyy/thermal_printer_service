@@ -5,8 +5,13 @@ No authentication required so Docker/k8s health checks work without a token.
 
 import time
 from datetime import datetime, timezone
-import psutil
 from fastapi import APIRouter
+
+try:
+    import psutil
+    _PSUTIL_AVAILABLE = True
+except ImportError:
+    _PSUTIL_AVAILABLE = False
 
 from app.core.config import get_settings
 from app.core.printer import get_printer
@@ -30,7 +35,7 @@ async def health():
     connected = printer is not None and printer.connected
 
     try:
-        mem_mb = psutil.Process().memory_info().rss / (1024 * 1024)
+        mem_mb = psutil.Process().memory_info().rss / (1024 * 1024) if _PSUTIL_AVAILABLE else 0.0
     except Exception:
         mem_mb = 0.0
 
