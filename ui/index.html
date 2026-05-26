@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thermal Printer Service — Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3354;
+      --accent: #4f7cff;
+      --accent-hover: #6b93ff;
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --text: #e8eaf6;
+      --text2: #9aa3c2;
+      --radius: 10px;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+
+    /* ── Layout ── */
+    .app { display: flex; flex-direction: column; min-height: 100vh; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between; }
+    header h1 { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
+    header .subtitle { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    main { flex: 1; padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+    /* ── Status bar ── */
+    .status-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .status-pill { display: flex; align-items: center; gap: 8px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 20px; padding: 8px 16px; font-size: 13px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot-red   { background: var(--red); }
+    .dot-amber { background: var(--amber); }
+    .dot-grey  { background: #4b5563; }
+
+    /* ── Grid ── */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .card h2 { font-size: 14px; font-weight: 600; color: var(--text2); text-transform: uppercase;
+      letter-spacing: .8px; margin-bottom: 16px; }
+
+    /* ── Form elements ── */
+    label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+    input, select, textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px; padding: 8px 10px; font-size: 13px;
+      font-family: var(--font); margin-bottom: 10px; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent);
+      color: #fff; border: none; border-radius: 6px; padding: 9px 18px;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .btn:hover { background: var(--accent-hover); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-red { background: #7f1d1d; }
+    .btn-red:hover { background: var(--red); }
+    .btn-green { background: #14532d; }
+    .btn-green:hover { background: var(--green); color: #000; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+
+    /* ── Toast ── */
+    #toast { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast-msg { background: var(--surface2); border-left: 4px solid var(--accent);
+      padding: 12px 16px; border-radius: 6px; font-size: 13px; min-width: 240px;
+      animation: fadeIn .2s; box-shadow: 0 4px 16px rgba(0,0,0,.4); }
+    .toast-msg.err { border-color: var(--red); }
+    .toast-msg.ok  { border-color: var(--green); }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 14px; }
+    .tab { padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+      color: var(--text2); border: 1px solid transparent; }
+    .tab.active { background: var(--accent); color: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Log table ── */
+    .log-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .log-table th { text-align: left; padding: 8px; color: var(--text2); border-bottom: 1px solid var(--border); }
+    .log-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .log-table tr:hover td { background: var(--surface2); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .badge-done   { background: #14532d; color: #86efac; }
+    .badge-failed { background: #7f1d1d; color: #fca5a5; }
+    .badge-info   { background: #1e3a5f; color: #93c5fd; }
+
+    /* ── Connection type indicator ── */
+    .conn-type { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .conn-usb { background: #312e81; color: #a5b4fc; }
+    .conn-lan { background: #1c3a1c; color: #86efac; }
+
+    /* ── Section dividers ── */
+    .section-header { display: flex; align-items: center; gap: 12px; margin: 24px 0 12px; }
+    .section-header .label { font-size: 12px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; white-space: nowrap; }
+    .section-header .line { flex: 1; height: 1px; background: var(--border); }
+    .option1-label { color: var(--green); }
+    .option2-label { color: var(--amber); }
+    .option2-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px;
+      background: #451a03; color: var(--amber); font-weight: 600; border: 1px solid #78350f; }
+
+    /* ── Lang switcher ── */
+    .lang-switcher { display: flex; gap: 6px; }
+    .lang-btn { padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;
+      background: transparent; border: 1px solid var(--border); color: var(--text2); }
+    .lang-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ── API URL config ── */
+    .api-cfg { display: flex; gap: 8px; align-items: center; }
+    .api-cfg input { margin-bottom: 0; flex: 1; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>🖨️ Thermal Printer Service</h1>
+      <div class="subtitle">Cashino KP-300 / KP-301H — REST API Dashboard</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('tr')">TR</button>
+        <button class="lang-btn" onclick="setLang('de')">DE</button>
+        <button class="lang-btn" onclick="setLang('fr')">FR</button>
+      </div>
+      <div style="font-size:12px;color:var(--text2);">
+        API: <input id="apiBase" value="http://localhost:8000" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:4px 8px;font-size:12px;width:200px;outline:none;" />
+      </div>
+      <div style="font-size:12px;color:var(--text2);">
+        Token: <input id="apiToken" type="password" placeholder="Bearer token" value="change-me-secret-token"
+          style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:4px 8px;font-size:12px;width:160px;outline:none;" />
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Status bar -->
+    <div class="status-bar" id="statusBar">
+      <div class="status-pill"><div class="dot dot-grey" id="connDot"></div><span id="connLabel">Not connected</span></div>
+      <div class="status-pill"><span id="connType">—</span></div>
+      <div class="status-pill">📄 Paper: <span id="paperStatus">—</span></div>
+      <div class="status-pill">🌡️ Temp: <span id="tempStatus">—</span></div>
+      <div class="status-pill">📬 Queue: <span id="queueSize">0</span></div>
+      <div class="status-pill">⏱️ Uptime: <span id="uptime">—</span></div>
+      <button class="btn btn-sm" onclick="refreshStatus()">↻ Refresh</button>
+    </div>
+
+    <!-- ── Option 1 divider ── -->
+    <div class="section-header">
+      <div class="line"></div>
+      <div class="label option1-label">🖨️ Option 1 — Standard Print (No LLM)</div>
+      <div class="line"></div>
+    </div>
+
+    <div class="grid">
+      <!-- ── Connection card ── -->
+      <div class="card">
+        <h2>Connection</h2>
+        <label>Connection Type</label>
+        <select id="connTypeSelect" onchange="toggleConnFields()">
+          <option value="usb">USB</option>
+          <option value="lan">LAN / Ethernet</option>
+        </select>
+        <div id="usbFields">
+          <label>USB Vendor ID (hex, optional)</label>
+          <input id="usbVendor" placeholder="e.g. 0x0456" />
+          <label>USB Product ID (hex, optional)</label>
+          <input id="usbProduct" placeholder="e.g. 0x0808" />
+        </div>
+        <div id="lanFields" style="display:none;">
+          <label>Printer IP Address</label>
+          <input id="lanHost" placeholder="192.168.1.100" />
+          <label>Port</label>
+          <input id="lanPort" value="9100" />
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-green" onclick="doConnect()">Connect</button>
+          <button class="btn btn-red" onclick="doDisconnect()">Disconnect</button>
+        </div>
+      </div>
+
+      <!-- ── Print Text card ── -->
+      <div class="card">
+        <h2>Print Text</h2>
+        <label>Job ID (optional, for idempotency)</label>
+        <input id="textJobId" placeholder="leave blank for auto" />
+        <label>Text (one line per line)</label>
+        <textarea id="textContent" placeholder="ACO RECYCLING&#10;Reward: 3.00 TL&#10;Glass: 0  Plastic: 2"></textarea>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">
+          <label style="margin:0;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="textBold" style="width:auto;margin:0;" /> Bold
+          </label>
+          <label style="margin:0;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="textCut" checked style="width:auto;margin:0;" /> Auto-cut
+          </label>
+          <select id="textAlign" style="width:auto;margin:0;padding:4px 8px;">
+            <option value="left">Left</option>
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+        <button class="btn" onclick="doPrintText()">🖨️ Print Text</button>
+      </div>
+
+      <!-- ── Print QR card ── -->
+      <div class="card">
+        <h2>Print QR Code</h2>
+        <label>Job ID (optional)</label>
+        <input id="qrJobId" placeholder="leave blank for auto" />
+        <label>QR Data</label>
+        <input id="qrData" placeholder="https://example.com or any text" />
+        <label>Label (optional, printed below QR)</label>
+        <input id="qrLabel" placeholder="Scan me!" />
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">
+          <label style="margin:0;color:var(--text2);font-size:12px;">Size</label>
+          <input type="range" id="qrSize" min="1" max="16" value="6" style="width:80px;margin:0;" oninput="document.getElementById('qrSizeVal').textContent=this.value" />
+          <span id="qrSizeVal" style="font-size:12px;">6</span>
+          <label style="margin:0;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="qrCut" checked style="width:auto;margin:0;" /> Cut
+          </label>
+        </div>
+        <button class="btn" onclick="doPrintQR()">⬛ Print QR</button>
+      </div>
+
+      <!-- ── Print Image card ── -->
+      <div class="card">
+        <h2>Print Image</h2>
+        <label>Job ID (optional)</label>
+        <input id="imgJobId" placeholder="leave blank for auto" />
+        <label>Select image (PNG/JPEG)</label>
+        <input type="file" id="imgFile" accept="image/png,image/jpeg" style="padding:6px;" />
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">
+          <label style="margin:0;display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="imgCut" checked style="width:auto;margin:0;" /> Auto-cut
+          </label>
+          <select id="imgAlign" style="width:auto;margin:0;padding:4px 8px;">
+            <option value="left">Left</option>
+            <option value="center" selected>Center</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+        <button class="btn" onclick="doPrintImage()">🖼️ Print Image</button>
+      </div>
+    </div>
+
+    <!-- ── Option 2 divider ── -->
+    <div class="section-header" style="margin-top:28px;">
+      <div class="line"></div>
+      <div class="label option2-label">🤖 Option 2 — LLM-Assisted Print</div>
+      <span class="option2-badge">Requires LLM_ENABLED=true in docker-compose.yml</span>
+      <div class="line"></div>
+    </div>
+
+    <!-- ── Smart Print (LLM) card ── -->
+    <div class="card">
+      <h2 style="color:var(--amber);">Smart Print <span class="option2-badge">LLM</span></h2>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">
+        Send structured JSON data — the LLM formats it as a receipt.
+        <strong style="color:var(--amber);">Set <code>LLM_ENABLED=true</code> + <code>OPENROUTER_API_KEY</code> in docker-compose.yml to activate.</strong>
+        Falls back to plain key-value format when disabled.
+      </p>
+      <label>Job ID (optional)</label>
+      <input id="smartJobId" placeholder="leave blank for auto" />
+      <label>Template hint (optional)</label>
+      <input id="smartHint" placeholder="e.g. recycling reward receipt" />
+      <label>JSON Data</label>
+      <textarea id="smartData" style="min-height:100px;font-family:monospace;">{
+  "machine_id": "ACO-TEST-0001-0001",
+  "reward": "3.00 TL",
+  "plastic": 2,
+  "metal": 1,
+  "glass": 0
+}</textarea>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;">
+        <label style="margin:0;display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="smartCut" checked style="width:auto;margin:0;" /> Auto-cut
+        </label>
+        <select id="smartLang" style="width:auto;margin:0;padding:4px 8px;">
+          <option value="en">EN</option>
+          <option value="tr">TR</option>
+          <option value="de">DE</option>
+          <option value="fr">FR</option>
+        </select>
+      </div>
+      <button class="btn" style="background:var(--amber);color:#000;" onclick="doPrintSmart()">🤖 Smart Print</button>
+    </div>
+
+    <!-- ── Logs & Reprint section ── -->
+    <div class="card" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h2 style="margin:0;">Print Logs</h2>
+        <div class="btn-row" style="margin:0;">
+          <button class="btn btn-sm" onclick="loadLogs()">↻ Refresh</button>
+          <button class="btn btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+          <button class="btn btn-sm" onclick="loadFailedJobs()">🔁 Failed Jobs</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('logsTab',this)">Log Entries</div>
+        <div class="tab" onclick="switchTab('failedTab',this)">Failed / Reprint Queue</div>
+      </div>
+      <div id="logsTab" class="tab-panel active">
+        <div style="overflow-x:auto;">
+          <table class="log-table">
+            <thead><tr>
+              <th>Timestamp</th><th>Operation</th><th>Connection</th>
+              <th>Job ID</th><th>Status</th><th>Error</th>
+            </tr></thead>
+            <tbody id="logBody"><tr><td colspan="6" style="color:var(--text2);text-align:center;padding:20px;">
+              Click ↻ Refresh to load logs
+            </td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="failedTab" class="tab-panel">
+        <div id="failedBody" style="color:var(--text2);font-size:13px;padding:10px;">
+          Click 🔁 Failed Jobs to load.
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── i18n strings ──────────────────────────────────────────────────────────────
+const LANGS = {
+  en: { connect:"Connect", disconnect:"Disconnect", connected:"Connected", not_connected:"Not connected",
+        print_text:"Print Text", print_qr:"Print QR", print_image:"Print Image",
+        paper_ok:"OK", paper_fail:"OUT", temp_ok:"OK", temp_warn:"HOT" },
+  tr: { connect:"Bağlan", disconnect:"Bağlantıyı Kes", connected:"Bağlandı", not_connected:"Bağlı Değil",
+        print_text:"Metin Yazdır", print_qr:"QR Yazdır", print_image:"Görsel Yazdır",
+        paper_ok:"OK", paper_fail:"YOK", temp_ok:"OK", temp_warn:"AŞIRI SICAK" },
+  de: { connect:"Verbinden", disconnect:"Trennen", connected:"Verbunden", not_connected:"Nicht verbunden",
+        print_text:"Text drucken", print_qr:"QR drucken", print_image:"Bild drucken",
+        paper_ok:"OK", paper_fail:"LEER", temp_ok:"OK", temp_warn:"ÜBERHITZT" },
+  fr: { connect:"Connecter", disconnect:"Déconnecter", connected:"Connecté", not_connected:"Non connecté",
+        print_text:"Imprimer texte", print_qr:"Imprimer QR", print_image:"Imprimer image",
+        paper_ok:"OK", paper_fail:"VIDE", temp_ok:"OK", temp_warn:"SURCHAUFFE" },
+};
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang.toUpperCase()));
+  refreshStatus();
+}
+
+function t(key) { return (LANGS[currentLang] || LANGS.en)[key] || key; }
+
+// ── API helpers ───────────────────────────────────────────────────────────────
+function apiBase() { return document.getElementById('apiBase').value.replace(/\/$/, ''); }
+function token()   { return document.getElementById('apiToken').value; }
+
+async function apiCall(method, path, body) {
+  const resp = await fetch(apiBase() + path, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token()}`,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) throw new Error(data?.detail || JSON.stringify(data));
+  return data;
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = `toast-msg ${type}`;
+  el.textContent = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ── Status ────────────────────────────────────────────────────────────────────
+async function refreshStatus() {
+  try {
+    const s = await apiCall('GET', '/status');
+    const dot = document.getElementById('connDot');
+    dot.className = 'dot ' + (s.connected ? 'dot-green' : 'dot-grey');
+    document.getElementById('connLabel').textContent = s.connected ? t('connected') : t('not_connected');
+    document.getElementById('connType').innerHTML = s.connection_type
+      ? `<span class="conn-type conn-${s.connection_type}">${s.connection_type.toUpperCase()}</span>` : '—';
+    document.getElementById('paperStatus').textContent = s.paper_ok == null ? '—'
+      : s.paper_ok ? t('paper_ok') : `⚠ ${t('paper_fail')}`;
+    document.getElementById('tempStatus').textContent = s.temperature_ok == null ? '—'
+      : s.temperature_ok ? t('temp_ok') : `⚠ ${t('temp_warn')}`;
+    document.getElementById('queueSize').textContent = s.queue_size;
+    document.getElementById('uptime').textContent = s.uptime_seconds ? `${Math.round(s.uptime_seconds)}s` : '—';
+  } catch (e) {
+    document.getElementById('connLabel').textContent = t('not_connected');
+    document.getElementById('connDot').className = 'dot dot-red';
+  }
+}
+
+// ── Connection ────────────────────────────────────────────────────────────────
+function toggleConnFields() {
+  const t = document.getElementById('connTypeSelect').value;
+  document.getElementById('usbFields').style.display = t === 'usb' ? '' : 'none';
+  document.getElementById('lanFields').style.display  = t === 'lan' ? '' : 'none';
+}
+
+async function doConnect() {
+  const connType = document.getElementById('connTypeSelect').value;
+  const body = { connection_type: connType };
+  if (connType === 'usb') {
+    const v = document.getElementById('usbVendor').value;
+    const p = document.getElementById('usbProduct').value;
+    if (v) body.usb_vendor_id = parseInt(v, 16);
+    if (p) body.usb_product_id = parseInt(p, 16);
+  } else {
+    const h = document.getElementById('lanHost').value;
+    const p = document.getElementById('lanPort').value;
+    if (h) body.lan_host = h;
+    if (p) body.lan_port = parseInt(p);
+  }
+  try {
+    const r = await apiCall('POST', '/connect', body);
+    toast(`✅ ${r.message}`, 'ok');
+    refreshStatus();
+  } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+}
+
+async function doDisconnect() {
+  try {
+    const r = await apiCall('POST', '/connect/disconnect');
+    toast(`🔌 ${r.message}`, 'ok');
+    refreshStatus();
+  } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+}
+
+// ── Print Text ────────────────────────────────────────────────────────────────
+async function doPrintText() {
+  const raw = document.getElementById('textContent').value;
+  const bold = document.getElementById('textBold').checked;
+  const cut  = document.getElementById('textCut').checked;
+  const align = document.getElementById('textAlign').value;
+  const jobId = document.getElementById('textJobId').value || undefined;
+  const lines = raw.split('\n').map(t => ({ text: t, bold, align, font_size: 'normal' }));
+  const body = { lines, cut, language: currentLang };
+  if (jobId) body.job_id = jobId;
+  try {
+    const r = await apiCall('POST', '/print/text', body);
+    toast(`✅ ${r.message} (${r.job_id})`, 'ok');
+    refreshStatus();
+  } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+}
+
+// ── Print QR ──────────────────────────────────────────────────────────────────
+async function doPrintQR() {
+  const data  = document.getElementById('qrData').value;
+  const label = document.getElementById('qrLabel').value || undefined;
+  const size  = parseInt(document.getElementById('qrSize').value);
+  const cut   = document.getElementById('qrCut').checked;
+  const jobId = document.getElementById('qrJobId').value || undefined;
+  const body  = { data, size, cut, language: currentLang };
+  if (label) body.label = label;
+  if (jobId) body.job_id = jobId;
+  try {
+    const r = await apiCall('POST', '/print/qr', body);
+    toast(`✅ ${r.message} (${r.job_id})`, 'ok');
+  } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+}
+
+// ── Print Image ───────────────────────────────────────────────────────────────
+async function doPrintImage() {
+  const file = document.getElementById('imgFile').files[0];
+  if (!file) { toast('⚠ Please select an image file.', 'err'); return; }
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const b64 = ev.target.result.split(',')[1];
+    const cut   = document.getElementById('imgCut').checked;
+    const align = document.getElementById('imgAlign').value;
+    const jobId = document.getElementById('imgJobId').value || undefined;
+    const body  = { image_base64: b64, align, cut };
+    if (jobId) body.job_id = jobId;
+    try {
+      const r = await apiCall('POST', '/print/image', body);
+      toast(`✅ ${r.message} (${r.job_id})`, 'ok');
+    } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── Smart Print (Option 2 — LLM) ──────────────────────────────────────────────
+async function doPrintSmart() {
+  const rawData = document.getElementById('smartData').value;
+  let data;
+  try {
+    data = JSON.parse(rawData);
+  } catch (e) { toast('⚠ Invalid JSON data.', 'err'); return; }
+  const hint  = document.getElementById('smartHint').value || undefined;
+  const cut   = document.getElementById('smartCut').checked;
+  const lang  = document.getElementById('smartLang').value;
+  const jobId = document.getElementById('smartJobId').value || undefined;
+  const body  = { data, cut, language: lang };
+  if (hint)  body.template_hint = hint;
+  if (jobId) body.job_id = jobId;
+  try {
+    const r = await apiCall('POST', '/print/smart', body);
+    toast(`✅ ${r.message} (${r.job_id})`, 'ok');
+  } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+}
+
+// ── Logs ──────────────────────────────────────────────────────────────────────
+async function loadLogs() {
+  try {
+    const r = await apiCall('GET', '/logs?page_size=200');
+    const tbody = document.getElementById('logBody');
+    if (!r.entries.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:20px;">No log entries yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = r.entries.slice().reverse().map(e => `
+      <tr>
+        <td style="white-space:nowrap;font-size:11px;">${e.ts.replace('T',' ').replace('Z','').substring(0,19)}</td>
+        <td>${e.op}</td>
+        <td>${e.conn ? `<span class="conn-type conn-${e.conn}">${e.conn.toUpperCase()}</span>` : '—'}</td>
+        <td style="font-family:monospace;font-size:11px;">${e.job_id ? e.job_id.substring(0,8)+'…' : '—'}</td>
+        <td><span class="badge badge-${e.status}">${e.status}</span></td>
+        <td style="font-size:11px;color:#fca5a5;">${e.error ? `${e.error.code}: ${e.error.detail}` : ''}</td>
+      </tr>
+    `).join('');
+  } catch (e) { toast(`❌ Failed to load logs: ${e.message}`, 'err'); }
+}
+
+async function exportCSV() {
+  const url = `${apiBase()}/logs/export`;
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'printer_logs.csv');
+  // Add auth header via fetch blob
+  try {
+    const resp = await fetch(url, { headers: { Authorization: `Bearer ${token()}` } });
+    const blob = await resp.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    link.href = objectUrl;
+    link.click();
+    URL.revokeObjectURL(objectUrl);
+    toast('⬇ CSV downloaded', 'ok');
+  } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+}
+
+async function loadFailedJobs() {
+  try {
+    const r = await apiCall('GET', '/logs/failed');
+    const container = document.getElementById('failedBody');
+    if (!r.failed_jobs.length) {
+      container.innerHTML = '<p style="color:var(--text2);">No failed jobs. 🎉</p>';
+      return;
+    }
+    container.innerHTML = r.failed_jobs.map(j => `
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-family:monospace;font-size:12px;color:var(--accent);">${j.job_id}</div>
+          <div style="font-size:12px;color:var(--text2);">${j.op} — ${j.created_at?.substring(0,19) || '?'} — attempts: ${j.attempts}</div>
+          <div style="font-size:11px;color:#fca5a5;">${j.last_error || ''}</div>
+        </div>
+        <button class="btn btn-sm" onclick="doReprint('${j.job_id}')">🔁 Reprint</button>
+      </div>
+    `).join('');
+  } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+}
+
+async function doReprint(jobId) {
+  try {
+    const r = await apiCall('POST', '/reprint', { job_id: jobId });
+    toast(`✅ ${r.message}`, 'ok');
+    loadFailedJobs();
+  } catch (e) { toast(`❌ ${e.message}`, 'err'); }
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function switchTab(panelId, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  el.classList.add('active');
+  if (panelId === 'logsTab') loadLogs();
+  if (panelId === 'failedTab') loadFailedJobs();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+refreshStatus();
+setInterval(refreshStatus, 10000);
+</script>
+</body>
+</html>
