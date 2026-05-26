@@ -1,0 +1,34 @@
+{
+  "error": {
+    "paper_out": "Kağıt bitti. Lütfen kağıt yükleyin ve tekrar deneyin.",
+    "paper_jam": "Kağıt sıkışması tespit edildi. Sıkışmayı giderin ve tekrar deneyin.",
+    "cover_open": "Yazıcı kapağı açık. Kapatın ve tekrar deneyin.",
+    "overheat": "Yazıcı aşırı ısınıyor. Soğumasını bekleyin.",
+    "comm_error": "Yazıcı ile iletişim hatası.",
+    "unknown_command": "Bilinmeyen veya desteklenmeyen ESC/POS komutu."
+  },
+  "status": {
+    "connected": "Yazıcı başarıyla bağlandı.",
+    "disconnected": "Yazıcı bağlantısı kesildi.",
+    "already_connected": "Yazıcı zaten bağlı.",
+    "not_connected": "Bağlı yazıcı yok. Önce POST /connect çağrısı yapın."
+  },
+  "print": {
+    "queued": "Yazdırma işi sıraya alındı.",
+    "done": "Yazdırma işi tamamlandı.",
+    "failed": "Yazdırma işi başarısız.",
+    "reprint_success": "Yeniden yazdırma başarıyla tamamlandı.",
+    "reprint_not_found": "İş kimliği başarısız kuyruğunda bulunamadı.",
+    "image_invalid": "Geçersiz veya desteklenmeyen görsel formatı.",
+    "qr_data_empty": "QR kodu verisi boş olamaz."
+  },
+  "health": {
+    "ok": "Servis sağlıklı çalışıyor.",
+    "degraded": "Servis çalışıyor ancak yazıcı bağlı değil."
+  },
+  "llm": {
+    "disabled": "LLM özelliği devre dışı. Etkinleştirmek için .env dosyasında LLM_ENABLED=true ayarlayın.",
+    "error": "LLM isteği başarısız oldu.",
+    "no_api_key": "OpenRouter API anahtarı yapılandırılmamış."
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "error": {
+    "paper_out": "Kein Papier. Bitte Papier einlegen und erneut versuchen.",
+    "paper_jam": "Papierstau erkannt. Stau beseitigen und erneut versuchen.",
+    "cover_open": "Druckerdeckel ist offen. Schließen und erneut versuchen.",
+    "overheat": "Drucker überhitzt. Bitte abkühlen lassen.",
+    "comm_error": "Kommunikationsfehler mit dem Drucker.",
+    "unknown_command": "Unbekannter oder nicht unterstützter ESC/POS-Befehl."
+  },
+  "status": {
+    "connected": "Drucker erfolgreich verbunden.",
+    "disconnected": "Druckerverbindung getrennt.",
+    "already_connected": "Drucker ist bereits verbunden.",
+    "not_connected": "Kein Drucker verbunden. Bitte zuerst POST /connect aufrufen."
+  },
+  "print": {
+    "queued": "Druckauftrag in der Warteschlange.",
+    "done": "Druckauftrag abgeschlossen.",
+    "failed": "Druckauftrag fehlgeschlagen.",
+    "reprint_success": "Neudrucken erfolgreich abgeschlossen.",
+    "reprint_not_found": "Auftrags-ID nicht in der Fehlerwarteschlange gefunden.",
+    "image_invalid": "Ungültiges oder nicht unterstütztes Bildformat.",
+    "qr_data_empty": "QR-Code-Daten dürfen nicht leer sein."
+  },
+  "health": {
+    "ok": "Dienst ist betriebsbereit.",
+    "degraded": "Dienst läuft, aber Drucker ist nicht verbunden."
+  },
+  "llm": {
+    "disabled": "LLM-Funktion ist deaktiviert. Setzen Sie LLM_ENABLED=true in .env zum Aktivieren.",
+    "error": "LLM-Anfrage fehlgeschlagen.",
+    "no_api_key": "OpenRouter API-Schlüssel nicht konfiguriert."
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "error": {
+    "paper_out": "Paper is out. Please load paper and retry.",
+    "paper_jam": "Paper jam detected. Clear the jam and retry.",
+    "cover_open": "Printer cover is open. Close it and retry.",
+    "overheat": "Printer is overheating. Wait for it to cool down.",
+    "comm_error": "Communication error with the printer.",
+    "unknown_command": "Unknown or unsupported ESC/POS command."
+  },
+  "status": {
+    "connected": "Printer connected successfully.",
+    "disconnected": "Printer disconnected.",
+    "already_connected": "Printer is already connected.",
+    "not_connected": "No printer connected. Call POST /connect first."
+  },
+  "print": {
+    "queued": "Print job queued.",
+    "done": "Print job completed.",
+    "failed": "Print job failed.",
+    "reprint_success": "Reprint completed successfully.",
+    "reprint_not_found": "Job ID not found in failed queue.",
+    "image_invalid": "Invalid or unsupported image format.",
+    "qr_data_empty": "QR code data cannot be empty."
+  },
+  "health": {
+    "ok": "Service is healthy.",
+    "degraded": "Service is running but printer is not connected."
+  },
+  "llm": {
+    "disabled": "LLM feature is disabled. Set LLM_ENABLED=true in .env to enable.",
+    "error": "LLM request failed.",
+    "no_api_key": "OpenRouter API key not configured."
+  }
+}

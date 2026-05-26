@@ -1,0 +1,34 @@
+{
+  "error": {
+    "paper_out": "Plus de papier. Veuillez charger du papier et réessayer.",
+    "paper_jam": "Bourrage papier détecté. Éliminez le bourrage et réessayez.",
+    "cover_open": "Le couvercle de l'imprimante est ouvert. Fermez-le et réessayez.",
+    "overheat": "L'imprimante surchauffe. Attendez qu'elle refroidisse.",
+    "comm_error": "Erreur de communication avec l'imprimante.",
+    "unknown_command": "Commande ESC/POS inconnue ou non prise en charge."
+  },
+  "status": {
+    "connected": "Imprimante connectée avec succès.",
+    "disconnected": "Imprimante déconnectée.",
+    "already_connected": "L'imprimante est déjà connectée.",
+    "not_connected": "Aucune imprimante connectée. Appelez d'abord POST /connect."
+  },
+  "print": {
+    "queued": "Tâche d'impression mise en file d'attente.",
+    "done": "Tâche d'impression terminée.",
+    "failed": "Tâche d'impression échouée.",
+    "reprint_success": "Réimpression terminée avec succès.",
+    "reprint_not_found": "ID de tâche introuvable dans la file d'attente des échecs.",
+    "image_invalid": "Format d'image invalide ou non pris en charge.",
+    "qr_data_empty": "Les données du code QR ne peuvent pas être vides."
+  },
+  "health": {
+    "ok": "Le service est en bonne santé.",
+    "degraded": "Le service fonctionne mais l'imprimante n'est pas connectée."
+  },
+  "llm": {
+    "disabled": "La fonctionnalité LLM est désactivée. Définissez LLM_ENABLED=true dans .env pour l'activer.",
+    "error": "La requête LLM a échoué.",
+    "no_api_key": "Clé API OpenRouter non configurée."
+  }
+}
