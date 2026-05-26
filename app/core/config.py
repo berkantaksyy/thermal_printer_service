@@ -5,6 +5,7 @@ All values are read from environment variables / .env file.
 
 from functools import lru_cache
 from typing import Literal
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,9 +30,17 @@ class Settings(BaseSettings):
     # ── Printer connection ────────────────────────────────────────────────────
     default_connection_type: Literal["usb", "lan"] = "usb"
 
-    # USB
+    # USB  (env vars may be decimal OR hex-string like "0x0456")
     usb_vendor_id: int = 0x0456
     usb_product_id: int = 0x0808
+
+    @field_validator("usb_vendor_id", "usb_product_id", mode="before")
+    @classmethod
+    def parse_hex_int(cls, v: object) -> object:
+        """Accept decimal strings ('1110') and hex strings ('0x0456') from .env."""
+        if isinstance(v, str):
+            return int(v, 0)   # int('0x0456', 0) → 1110; int('1110', 0) → 1110
+        return v
 
     # LAN
     lan_host: str = "192.168.1.100"
@@ -51,11 +60,14 @@ class Settings(BaseSettings):
     # ── i18n ─────────────────────────────────────────────────────────────────
     default_language: str = "en"
 
-    # ── LLM (optional) ───────────────────────────────────────────────────────
+    # ── LLM — Groq (optional) ────────────────────────────────────────────────
+    # Set LLM_ENABLED=true and provide GROQ_API_KEY to activate.
+    # Free models: llama3-8b-8192, llama3-70b-8192, mixtral-8x7b-32768
+    # Get your free key at: https://console.groq.com
     llm_enabled: bool = False
-    openrouter_api_key: str = ""
-    openrouter_model: str = "mistralai/mistral-7b-instruct:free"
-    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    groq_api_key: str = ""
+    groq_model: str = "llama3-8b-8192"
+    groq_base_url: str = "https://api.groq.com/openai/v1"
 
 
 @lru_cache

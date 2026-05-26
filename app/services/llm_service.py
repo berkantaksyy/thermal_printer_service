@@ -1,24 +1,24 @@
 """
-Optional LLM service via OpenRouter.
+Optional LLM service via Groq (OpenAI-compatible API).
 
 IMPORTANT NOTE (per task requirement):
-  This is an OPTIONAL bonus feature. It requires an external API key (OpenRouter).
+  This is an OPTIONAL bonus feature. It requires an external API key (Groq).
   The task specifies: "Dış servis/anahtar gerektiren ücretli SDK kullanmayınız
   (gerekirse açıkça not ediniz)."
 
   LLM is disabled by default (LLM_ENABLED=false in .env).
   When disabled, the service works 100% without any external dependency.
-  When enabled, the user must supply their own OPENROUTER_API_KEY.
-  The free model (mistralai/mistral-7b-instruct:free) is used by default.
+  When enabled, the user must supply their own GROQ_API_KEY.
 
-Uses: httpx (async HTTP, already in requirements.txt)
+  Groq offers free-tier access with models like llama3-8b-8192.
+  Uses the OpenAI-compatible endpoint: https://api.groq.com/openai/v1
 """
 
 import json
 import logging
 from typing import Any, Optional
 
-import httpx
+from openai import OpenAI
 
 from app.core.config import get_settings
 
@@ -27,16 +27,25 @@ logger = logging.getLogger(__name__)
 
 class LlmService:
     """
-    Async OpenRouter LLM client.
-    Disabled when settings.llm_enabled is False.
+    Groq LLM client (OpenAI-compatible).
+    Disabled when settings.llm_enabled is False or GROQ_API_KEY is empty.
     """
 
     def __init__(self):
         settings = get_settings()
         self._enabled = settings.llm_enabled
-        self._api_key = settings.openrouter_api_key
-        self._model = settings.openrouter_model
-        self._base_url = settings.openrouter_base_url
+        self._api_key = settings.groq_api_key
+        self._model = settings.groq_model
+        self._base_url = settings.groq_base_url
+        self._client: Optional[OpenAI] = None
+
+    def _get_client(self) -> OpenAI:
+        if self._client is None:
+            self._client = OpenAI(
+                base_url=self._base_url,
+                api_key=self._api_key,
+            )
+        return self._client
 
     @property
     def enabled(self) -> bool:
@@ -58,7 +67,7 @@ class LlmService:
 
         prompt = self._build_receipt_prompt(data, language, template_hint)
         try:
-            response_text = await self._chat(prompt)
+            response_text = self._chat(prompt)
             lines = self._parse_llm_receipt(response_text)
             return lines if lines else self._fallback_format(data)
         except Exception as exc:
@@ -77,32 +86,28 @@ class LlmService:
             "Max 1 sentence. No extra commentary."
         )
         try:
-            return await self._chat(prompt)
+            return self._chat(prompt)
         except Exception:
             return None
 
-    async def _chat(self, prompt: str, max_tokens: int = 512) -> str:
-        """Send a single chat message to OpenRouter and return the response text."""
-        headers = {
-            "Authorization": f"Bearer {self._api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "http://localhost:8000",
-            "X-Title": "Thermal Printer Service",
-        }
-        payload = {
-            "model": self._model,
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": max_tokens,
-        }
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            resp = await client.post(
-                f"{self._base_url}/chat/completions",
-                headers=headers,
-                json=payload,
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            return data["choices"][0]["message"]["content"].strip()
+    def _chat(self, prompt: str, max_tokens: int = 512) -> str:
+        """Send a single chat message to Groq and return the response text."""
+        client = self._get_client()
+        response = client.chat.completions.create(
+            model=self._model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Sen kısa ve öz cevaplar veren bir asistansın.",
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            max_tokens=max_tokens,
+        )
+        return response.choices[0].message.content.strip()
 
     def _build_receipt_prompt(
         self,
@@ -126,7 +131,6 @@ class LlmService:
 
     def _parse_llm_receipt(self, text: str) -> list[dict]:
         """Extract JSON array from LLM response."""
-        # Try to find JSON array in response
         start = text.find("[")
         end = text.rfind("]") + 1
         if start == -1 or end == 0:

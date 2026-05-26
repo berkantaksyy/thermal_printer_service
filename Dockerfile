@@ -37,8 +37,8 @@ COPY .env.example ./.env.example
 # Create runtime directories
 RUN mkdir -p logs data/failed_jobs ui
 
-# Copy UI if present
-COPY ui/ ./ui/ 2>/dev/null || true
+# Copy UI
+COPY ui/ ./ui/
 
 # Non-root user for security
 RUN useradd -m -u 1001 printeruser && \
