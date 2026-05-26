@@ -1,0 +1,123 @@
+{
+  "app": {
+    "title": "Service d'Imprimante Thermique",
+    "subtitle": "Cashino KP-300 / KP-301H"
+  },
+  "status": {
+    "connected": "Connecté",
+    "disconnected": "Non connecté",
+    "queue": "File d'attente",
+    "uptime": "Durée de fonctionnement",
+    "memory": "Mémoire",
+    "refresh": "Actualiser"
+  },
+  "connection": {
+    "title": "Connexion",
+    "type": "Type de connexion",
+    "usb": "USB",
+    "lan": "LAN / Ethernet",
+    "usbVendor": "ID fournisseur USB (optionnel)",
+    "usbProduct": "ID produit USB (optionnel)",
+    "lanHost": "Adresse IP de l'imprimante",
+    "lanPort": "Port",
+    "connect": "Connecter",
+    "disconnect": "Déconnecter",
+    "connecting": "Connexion...",
+    "disconnecting": "Déconnexion..."
+  },
+  "print": {
+    "text": {
+      "title": "Imprimer texte",
+      "jobId": "ID tâche (laisser vide = auto)",
+      "content": "Contenu texte",
+      "contentPlaceholder": "Chaque ligne imprimée séparément...",
+      "bold": "Gras",
+      "underline": "Souligné",
+      "align": "Alignement",
+      "alignLeft": "Gauche",
+      "alignCenter": "Centre",
+      "alignRight": "Droite",
+      "fontSize": "Taille de police",
+      "fontNormal": "Normal",
+      "fontDouble": "Double",
+      "autoCut": "Coupe auto",
+      "button": "Imprimer"
+    },
+    "qr": {
+      "title": "Imprimer QR",
+      "jobId": "ID tâche (laisser vide = auto)",
+      "data": "Contenu QR",
+      "dataPlaceholder": "URL ou texte...",
+      "label": "Étiquette (optionnel)",
+      "labelPlaceholder": "Affiché sous le QR...",
+      "size": "Taille",
+      "errorCorrection": "Correction d'erreur",
+      "align": "Alignement",
+      "autoCut": "Coupe auto",
+      "button": "Imprimer QR"
+    },
+    "image": {
+      "title": "Imprimer image",
+      "jobId": "ID tâche (laisser vide = auto)",
+      "selectFile": "Choisir une image",
+      "dragDrop": "ou glisser-déposer ici",
+      "supportedFormats": "PNG, JPEG pris en charge",
+      "align": "Alignement",
+      "autoCut": "Coupe auto",
+      "button": "Imprimer image",
+      "noFile": "Veuillez sélectionner une image"
+    },
+    "smart": {
+      "title": "Impression intelligente (IA)",
+      "description": "Envoyez des données JSON, l'IA les formate en reçu",
+      "jobId": "ID tâche (laisser vide = auto)",
+      "hint": "Type de reçu (optionnel)",
+      "hintPlaceholder": "ex: reçu café, reçu magasin",
+      "data": "Données JSON",
+      "dataPlaceholder": "{\n  \"client\": \"Pierre\",\n  \"total\": \"50€\"\n}",
+      "language": "Langue",
+      "autoCut": "Coupe auto",
+      "button": "Impression intelligente",
+      "invalidJson": "Format JSON invalide"
+    }
+  },
+  "logs": {
+    "title": "Journaux",
+    "refresh": "Actualiser",
+    "export": "Exporter CSV",
+    "empty": "Aucune entrée de journal",
+    "columns": {
+      "time": "Heure",
+      "operation": "Opération",
+      "jobId": "ID tâche",
+      "status": "Statut",
+      "error": "Erreur"
+    },
+    "status": {
+      "done": "Terminé",
+      "failed": "Échoué",
+      "info": "Info"
+    }
+  },
+  "toast": {
+    "success": "Succès",
+    "error": "Erreur",
+    "warning": "Avertissement",
+    "info": "Info"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "clear": "Effacer",
+    "yes": "Oui",
+    "no": "Non",
+    "optional": "optionnel",
+    "required": "requis"
+  }
+}

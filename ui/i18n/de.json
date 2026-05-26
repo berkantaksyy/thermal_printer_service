@@ -1,0 +1,123 @@
+{
+  "app": {
+    "title": "Thermodrucker-Service",
+    "subtitle": "Cashino KP-300 / KP-301H"
+  },
+  "status": {
+    "connected": "Verbunden",
+    "disconnected": "Nicht verbunden",
+    "queue": "Warteschlange",
+    "uptime": "Laufzeit",
+    "memory": "Speicher",
+    "refresh": "Aktualisieren"
+  },
+  "connection": {
+    "title": "Verbindung",
+    "type": "Verbindungstyp",
+    "usb": "USB",
+    "lan": "LAN / Ethernet",
+    "usbVendor": "USB Hersteller-ID (optional)",
+    "usbProduct": "USB Produkt-ID (optional)",
+    "lanHost": "Drucker IP-Adresse",
+    "lanPort": "Port",
+    "connect": "Verbinden",
+    "disconnect": "Trennen",
+    "connecting": "Verbinden...",
+    "disconnecting": "Trennen..."
+  },
+  "print": {
+    "text": {
+      "title": "Text drucken",
+      "jobId": "Auftrags-ID (leer lassen = auto)",
+      "content": "Textinhalt",
+      "contentPlaceholder": "Jede Zeile wird einzeln gedruckt...",
+      "bold": "Fett",
+      "underline": "Unterstrichen",
+      "align": "Ausrichtung",
+      "alignLeft": "Links",
+      "alignCenter": "Mitte",
+      "alignRight": "Rechts",
+      "fontSize": "Schriftgröße",
+      "fontNormal": "Normal",
+      "fontDouble": "Doppelt",
+      "autoCut": "Autom. Schnitt",
+      "button": "Drucken"
+    },
+    "qr": {
+      "title": "QR-Code drucken",
+      "jobId": "Auftrags-ID (leer lassen = auto)",
+      "data": "QR-Inhalt",
+      "dataPlaceholder": "URL oder Text...",
+      "label": "Beschriftung (optional)",
+      "labelPlaceholder": "Unter QR-Code angezeigt...",
+      "size": "Größe",
+      "errorCorrection": "Fehlerkorrektur",
+      "align": "Ausrichtung",
+      "autoCut": "Autom. Schnitt",
+      "button": "QR drucken"
+    },
+    "image": {
+      "title": "Bild drucken",
+      "jobId": "Auftrags-ID (leer lassen = auto)",
+      "selectFile": "Bild wählen",
+      "dragDrop": "oder hier ablegen",
+      "supportedFormats": "PNG, JPEG unterstützt",
+      "align": "Ausrichtung",
+      "autoCut": "Autom. Schnitt",
+      "button": "Bild drucken",
+      "noFile": "Bitte ein Bild auswählen"
+    },
+    "smart": {
+      "title": "Intelligenter Druck (KI)",
+      "description": "JSON-Daten senden, KI formatiert als Beleg",
+      "jobId": "Auftrags-ID (leer lassen = auto)",
+      "hint": "Belegtyp-Hinweis (optional)",
+      "hintPlaceholder": "z.B: Café-Beleg, Geschäftsbeleg",
+      "data": "JSON-Daten",
+      "dataPlaceholder": "{\n  \"kunde\": \"Hans\",\n  \"gesamt\": \"50€\"\n}",
+      "language": "Sprache",
+      "autoCut": "Autom. Schnitt",
+      "button": "Intelligent drucken",
+      "invalidJson": "Ungültiges JSON-Format"
+    }
+  },
+  "logs": {
+    "title": "Protokoll",
+    "refresh": "Aktualisieren",
+    "export": "CSV exportieren",
+    "empty": "Noch keine Protokolleinträge",
+    "columns": {
+      "time": "Zeit",
+      "operation": "Vorgang",
+      "jobId": "Auftrags-ID",
+      "status": "Status",
+      "error": "Fehler"
+    },
+    "status": {
+      "done": "Erledigt",
+      "failed": "Fehlgeschlagen",
+      "info": "Info"
+    }
+  },
+  "toast": {
+    "success": "Erfolg",
+    "error": "Fehler",
+    "warning": "Warnung",
+    "info": "Info"
+  },
+  "common": {
+    "loading": "Laden...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "clear": "Löschen",
+    "yes": "Ja",
+    "no": "Nein",
+    "optional": "optional",
+    "required": "erforderlich"
+  }
+}

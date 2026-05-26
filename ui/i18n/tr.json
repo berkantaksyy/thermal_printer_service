@@ -1,0 +1,125 @@
+{
+  "app": {
+    "title": "Termal Yazıcı Servisi",
+    "subtitle": "Cashino KP-300 / KP-301H",
+    "apiToken": "API Token",
+    "apiUrl": "API URL"
+  },
+  "status": {
+    "connected": "Bağlı",
+    "disconnected": "Bağlı Değil",
+    "queue": "Kuyruk",
+    "uptime": "Çalışma Süresi",
+    "memory": "Bellek",
+    "refresh": "↻ Yenile"
+  },
+  "connection": {
+    "title": "Bağlantı",
+    "type": "Bağlantı Tipi",
+    "usb": "USB",
+    "lan": "LAN / Ethernet",
+    "usbVendor": "USB Vendor ID (opsiyonel)",
+    "usbProduct": "USB Product ID (opsiyonel)",
+    "lanHost": "Yazıcı IP Adresi",
+    "lanPort": "Port",
+    "connect": "Bağlan",
+    "disconnect": "Bağlantıyı Kes",
+    "connecting": "Bağlanıyor...",
+    "disconnecting": "Kesiliyor..."
+  },
+  "print": {
+    "text": {
+      "title": "Metin Yazdır",
+      "jobId": "İş ID (boş bırak = otomatik)",
+      "content": "Metin İçeriği",
+      "contentPlaceholder": "Her satır ayrı yazdırılır...",
+      "bold": "Kalın",
+      "underline": "Altı Çizili",
+      "align": "Hizalama",
+      "alignLeft": "Sola",
+      "alignCenter": "Ortala",
+      "alignRight": "Sağa",
+      "fontSize": "Font Boyutu",
+      "fontNormal": "Normal",
+      "fontDouble": "Çift",
+      "autoCut": "Otomatik Kes",
+      "button": "Yazdır"
+    },
+    "qr": {
+      "title": "QR Kod Yazdır",
+      "jobId": "İş ID (boş bırak = otomatik)",
+      "data": "QR İçeriği",
+      "dataPlaceholder": "URL veya metin...",
+      "label": "Etiket (opsiyonel)",
+      "labelPlaceholder": "QR kodun altında görünür...",
+      "size": "Boyut",
+      "errorCorrection": "Hata Düzeltme",
+      "align": "Hizalama",
+      "autoCut": "Otomatik Kes",
+      "button": "QR Yazdır"
+    },
+    "image": {
+      "title": "Görsel Yazdır",
+      "jobId": "İş ID (boş bırak = otomatik)",
+      "selectFile": "Görsel Seç",
+      "dragDrop": "veya buraya sürükle-bırak",
+      "supportedFormats": "PNG, JPEG desteklenir",
+      "align": "Hizalama",
+      "autoCut": "Otomatik Kes",
+      "button": "Görseli Yazdır",
+      "noFile": "Lütfen bir görsel seçin"
+    },
+    "smart": {
+      "title": "Akıllı Yazdırma (AI)",
+      "description": "JSON veri gönder, yapay zeka fiş formatına dönüştürsün",
+      "jobId": "İş ID (boş bırak = otomatik)",
+      "hint": "Fiş Tipi İpucu (opsiyonel)",
+      "hintPlaceholder": "örn: kafe fişi, market fişi",
+      "data": "JSON Veri",
+      "dataPlaceholder": "{\n  \"müşteri\": \"Ahmet\",\n  \"toplam\": \"50 TL\"\n}",
+      "language": "Dil",
+      "autoCut": "Otomatik Kes",
+      "button": "Akıllı Yazdır",
+      "invalidJson": "Geçersiz JSON formatı"
+    }
+  },
+  "logs": {
+    "title": "Loglar",
+    "refresh": "Yenile",
+    "export": "CSV İndir",
+    "empty": "Henüz log kaydı yok",
+    "columns": {
+      "time": "Zaman",
+      "operation": "İşlem",
+      "jobId": "İş ID",
+      "status": "Durum",
+      "error": "Hata"
+    },
+    "status": {
+      "done": "Başarılı",
+      "failed": "Başarısız",
+      "info": "Bilgi"
+    }
+  },
+  "toast": {
+    "success": "Başarılı",
+    "error": "Hata",
+    "warning": "Uyarı",
+    "info": "Bilgi"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "close": "Kapat",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "clear": "Temizle",
+    "yes": "Evet",
+    "no": "Hayır",
+    "optional": "opsiyonel",
+    "required": "zorunlu"
+  }
+}

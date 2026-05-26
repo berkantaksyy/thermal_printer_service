@@ -1,6 +1,5 @@
 """
-GET /health — Service health check
-No authentication required so Docker/k8s health checks work without a token.
+Servis sağlık kontrolü endpoint'i
 """
 
 import time
@@ -18,7 +17,7 @@ from app.core.printer import get_printer
 from app.models.responses import HealthResponse
 from app.services.queue_service import get_queue_service
 
-router = APIRouter(tags=["Health"])
+router = APIRouter(tags=["💚 Sağlık"])
 
 _start_time = time.monotonic()
 
@@ -26,8 +25,17 @@ _start_time = time.monotonic()
 @router.get("/health", response_model=HealthResponse)
 async def health():
     """
-    Health check endpoint. Does not require Bearer token.
-    Returns: service status, uptime, printer connection, queue size, memory usage.
+    Servis sağlık kontrolü (Docker/Kubernetes için).
+    
+    **Özellik:** Bearer token gerektirmez.
+    
+    **Dönen Bilgiler:**
+    - Servis durumu (ok/degraded)
+    - Versiyon
+    - Çalışma süresi
+    - Yazıcı bağlantı durumu
+    - Kuyruk boyutu
+    - Bellek kullanımı
     """
     settings = get_settings()
     printer = get_printer()

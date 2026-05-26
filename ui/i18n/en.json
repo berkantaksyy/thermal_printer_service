@@ -1,0 +1,123 @@
+{
+  "app": {
+    "title": "Thermal Printer Service",
+    "subtitle": "Cashino KP-300 / KP-301H"
+  },
+  "status": {
+    "connected": "Connected",
+    "disconnected": "Not Connected",
+    "queue": "Queue",
+    "uptime": "Uptime",
+    "memory": "Memory",
+    "refresh": "Refresh"
+  },
+  "connection": {
+    "title": "Connection",
+    "type": "Connection Type",
+    "usb": "USB",
+    "lan": "LAN / Ethernet",
+    "usbVendor": "USB Vendor ID (optional)",
+    "usbProduct": "USB Product ID (optional)",
+    "lanHost": "Printer IP Address",
+    "lanPort": "Port",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connecting": "Connecting...",
+    "disconnecting": "Disconnecting..."
+  },
+  "print": {
+    "text": {
+      "title": "Print Text",
+      "jobId": "Job ID (leave blank = auto)",
+      "content": "Text Content",
+      "contentPlaceholder": "Each line printed separately...",
+      "bold": "Bold",
+      "underline": "Underline",
+      "align": "Alignment",
+      "alignLeft": "Left",
+      "alignCenter": "Center",
+      "alignRight": "Right",
+      "fontSize": "Font Size",
+      "fontNormal": "Normal",
+      "fontDouble": "Double",
+      "autoCut": "Auto-cut",
+      "button": "Print"
+    },
+    "qr": {
+      "title": "Print QR Code",
+      "jobId": "Job ID (leave blank = auto)",
+      "data": "QR Content",
+      "dataPlaceholder": "URL or text...",
+      "label": "Label (optional)",
+      "labelPlaceholder": "Shown below QR code...",
+      "size": "Size",
+      "errorCorrection": "Error Correction",
+      "align": "Alignment",
+      "autoCut": "Auto-cut",
+      "button": "Print QR"
+    },
+    "image": {
+      "title": "Print Image",
+      "jobId": "Job ID (leave blank = auto)",
+      "selectFile": "Select Image",
+      "dragDrop": "or drag & drop here",
+      "supportedFormats": "PNG, JPEG supported",
+      "align": "Alignment",
+      "autoCut": "Auto-cut",
+      "button": "Print Image",
+      "noFile": "Please select an image"
+    },
+    "smart": {
+      "title": "Smart Print (AI)",
+      "description": "Send JSON data, AI formats it as a receipt",
+      "jobId": "Job ID (leave blank = auto)",
+      "hint": "Receipt Type Hint (optional)",
+      "hintPlaceholder": "e.g: cafe receipt, store receipt",
+      "data": "JSON Data",
+      "dataPlaceholder": "{\n  \"customer\": \"John\",\n  \"total\": \"$50\"\n}",
+      "language": "Language",
+      "autoCut": "Auto-cut",
+      "button": "Smart Print",
+      "invalidJson": "Invalid JSON format"
+    }
+  },
+  "logs": {
+    "title": "Logs",
+    "refresh": "Refresh",
+    "export": "Export CSV",
+    "empty": "No log entries yet",
+    "columns": {
+      "time": "Time",
+      "operation": "Operation",
+      "jobId": "Job ID",
+      "status": "Status",
+      "error": "Error"
+    },
+    "status": {
+      "done": "Done",
+      "failed": "Failed",
+      "info": "Info"
+    }
+  },
+  "toast": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "yes": "Yes",
+    "no": "No",
+    "optional": "optional",
+    "required": "required"
+  }
+}

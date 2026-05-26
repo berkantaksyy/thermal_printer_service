@@ -44,16 +44,30 @@ def create_app() -> FastAPI:
     settings = get_settings()
 
     app = FastAPI(
-        title=settings.app_title,
+        title="🖨️ Termal Yazıcı Servisi",
         version=settings.app_version,
         description=(
-            "REST API for Cashino KP-300 / KP-301H thermal printers. "
-            "Supports USB and LAN connections, ESC/POS commands, "
-            "job queueing, structured logging, and i18n (TR/EN/DE/FR)."
+            "**Cashino KP-300 / KP-301H** termal yazıcılar için REST API servisi.\n\n"
+            "### Özellikler\n"
+            "- 🔌 USB ve LAN bağlantı desteği\n"
+            "- 📝 Metin, görsel ve QR kod yazdırma\n"
+            "- 🤖 Yapay zeka destekli akıllı yazdırma (opsiyonel)\n"
+            "- 🌍 Çoklu dil desteği (TR/EN/DE/FR)\n"
+            "- 📊 Detaylı loglama ve kuyruk yönetimi\n\n"
+            "### Kimlik Doğrulama\n"
+            "`/health` endpoint'i hariç tüm istekler Bearer token gerektirir:\n"
+            "```\nAuthorization: Bearer your-token-here\n```\n\n"
+            "Token'ı `.env` dosyasında `API_BEARER_TOKEN` ile ayarlayın."
         ),
         docs_url="/docs",
         redoc_url="/redoc",
         lifespan=lifespan,
+        swagger_ui_parameters={
+            "defaultModelsExpandDepth": -1,  # Model şemalarını gizle
+            "docExpansion": "list",  # Endpoint'leri liste olarak göster
+            "filter": True,  # Arama kutusu ekle
+            "syntaxHighlight.theme": "monokai",  # Dark tema
+        }
     )
 
     # ── CORS ──────────────────────────────────────────────────────────────────

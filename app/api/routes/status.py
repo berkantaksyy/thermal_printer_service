@@ -1,5 +1,5 @@
 """
-GET /status — Printer status
+Yazıcı durum endpoint'i
 """
 
 from datetime import datetime, timezone
@@ -10,14 +10,22 @@ from app.core.printer import get_printer
 from app.models.responses import StatusResponse
 from app.services.queue_service import get_queue_service
 
-router = APIRouter(tags=["Status"])
+router = APIRouter(tags=["📊 Durum"])
 
 
 @router.get("/status", response_model=StatusResponse, dependencies=[Depends(verify_token)])
 async def get_status():
     """
-    Return current printer connection status, paper/cover/temperature state,
-    and queue depth.
+    Yazıcı durumunu sorgula.
+    
+    **Dönen Bilgiler:**
+    - Bağlantı durumu (bağlı/bağlı değil)
+    - Bağlantı tipi (USB/LAN)
+    - Kağıt durumu
+    - Kapak durumu
+    - Sıcaklık durumu
+    - Kuyruk boyutu
+    - Çalışma süresi
     """
     printer = get_printer()
     queue = get_queue_service()

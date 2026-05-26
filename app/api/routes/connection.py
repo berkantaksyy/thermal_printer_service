@@ -1,6 +1,5 @@
 """
-POST /connect   — Connect to printer
-POST /disconnect — Disconnect from printer
+Yazıcı bağlantı endpoint'leri
 """
 
 from datetime import datetime, timezone
@@ -14,14 +13,31 @@ from app.models.responses import ConnectResponse
 from app.services.log_service import get_log_service
 from app.services.i18n_service import get_i18n_service
 
-router = APIRouter(prefix="/connect", tags=["Connection"])
+router = APIRouter(prefix="/connect", tags=["🔌 Bağlantı"])
 
 
 @router.post("", response_model=ConnectResponse, dependencies=[Depends(verify_token)])
 async def connect(req: ConnectRequest):
     """
-    Connect to Cashino KP-300 / KP-301H via USB or LAN.
-    Disconnects any existing connection before reconnecting.
+    Yazıcıya bağlan (USB veya LAN).
+    
+    **USB Bağlantısı:**
+    ```json
+    {
+      "connection_type": "usb"
+    }
+    ```
+    
+    **LAN Bağlantısı:**
+    ```json
+    {
+      "connection_type": "lan",
+      "lan_host": "192.168.1.100",
+      "lan_port": 9100
+    }
+    ```
+    
+    Mevcut bağlantı varsa önce kesilir, sonra yeni bağlantı kurulur.
     """
     log = get_log_service()
     i18n = get_i18n_service()
@@ -66,7 +82,11 @@ async def connect(req: ConnectRequest):
 
 @router.post("/disconnect", response_model=ConnectResponse, dependencies=[Depends(verify_token)])
 async def disconnect():
-    """Disconnect the currently connected printer."""
+    """
+    Yazıcı bağlantısını kes.
+    
+    Aktif bağlantı varsa güvenli bir şekilde kesilir.
+    """
     log = get_log_service()
     i18n = get_i18n_service()
 

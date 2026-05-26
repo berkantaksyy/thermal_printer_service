@@ -37,7 +37,7 @@ pytest-cache-files-*/
 *secret*
 
 # LLM API key protection
-# OPENROUTER_API_KEY must never be committed.
+# GROQ_API_KEY must never be committed (starts with "gsk_").
 # Always use docker-compose.yml environment variables or
 # a local .env file (which is gitignored above).
 # Safe to commit: .env.example (it contains no real keys)

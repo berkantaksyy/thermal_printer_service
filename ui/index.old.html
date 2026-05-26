@@ -13,7 +13,9 @@
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════════════════════ -->
   <header class="header">
     <div class="header-content">
       <div class="header-title">
@@ -24,6 +26,7 @@
       </div>
       
       <div class="header-actions">
+        <!-- Dil Seçici -->
         <div class="lang-switcher">
           <button class="lang-btn active" data-lang="tr">TR</button>
           <button class="lang-btn" data-lang="en">EN</button>
@@ -34,7 +37,9 @@
     </div>
   </header>
 
-  <!-- MAIN -->
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MAIN CONTAINER
+       ═══════════════════════════════════════════════════════════════════ -->
   <main class="container">
 
     <!-- API Ayarları -->
@@ -78,7 +83,9 @@
       </button>
     </div>
 
-    <!-- BAĞLANTI -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         BAĞLANTI
+         ═══════════════════════════════════════════════════════════════ -->
     <section class="section">
       <div class="section-header" data-i18n="connection.title">BAĞLANTI</div>
       
@@ -91,6 +98,7 @@
           </select>
         </div>
 
+        <!-- USB Alanları -->
         <div id="usbFields">
           <div class="form-group">
             <label data-i18n="connection.usbVendor">USB Vendor ID (opsiyonel)</label>
@@ -102,6 +110,7 @@
           </div>
         </div>
 
+        <!-- LAN Alanları -->
         <div id="lanFields" class="hidden">
           <div class="form-group">
             <label data-i18n="connection.lanHost">Yazıcı IP Adresi</label>
@@ -126,13 +135,15 @@
       </div>
     </section>
 
-    <!-- YAZDIRMA -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         YAZDIRMA
+         ═══════════════════════════════════════════════════════════════ -->
     <section class="section">
       <div class="section-header">YAZDIRMA</div>
       
       <div class="grid grid-2">
         
-        <!-- Metin -->
+        <!-- Metin Yazdır -->
         <div class="card">
           <div class="card-title">
             <span>📝</span>
@@ -140,44 +151,50 @@
           </div>
           
           <div class="form-group">
-            <label data-i18n="print.text.jobId">İş ID</label>
+            <label data-i18n="print.text.jobId">İş ID (boş bırak = otomatik)</label>
             <input type="text" id="textJobId">
           </div>
           
           <div class="form-group">
-            <label data-i18n="print.text.content">Metin</label>
-            <textarea id="textContent" rows="4"></textarea>
+            <label data-i18n="print.text.content">Metin İçeriği</label>
+            <textarea id="textContent" rows="4" data-i18n="print.text.contentPlaceholder" placeholder="Her satır ayrı yazdırılır..."></textarea>
           </div>
           
           <div class="form-row">
-            <label class="checkbox-label">
-              <input type="checkbox" id="textBold">
-              <span data-i18n="print.text.bold">Kalın</span>
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="textUnderline">
-              <span data-i18n="print.text.underline">Altı Çizili</span>
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="textAutoCut" checked>
-              <span data-i18n="print.text.autoCut">Otomatik Kes</span>
-            </label>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="textBold">
+                <span data-i18n="print.text.bold">Kalın</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="textUnderline">
+                <span data-i18n="print.text.underline">Altı Çizili</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="textAutoCut" checked>
+                <span data-i18n="print.text.autoCut">Otomatik Kes</span>
+              </label>
+            </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label data-i18n="print.text.align">Hizalama</label>
               <select id="textAlign">
-                <option value="left">Sola</option>
-                <option value="center">Ortala</option>
-                <option value="right">Sağa</option>
+                <option value="left" data-i18n="print.text.alignLeft">Sola</option>
+                <option value="center" data-i18n="print.text.alignCenter">Ortala</option>
+                <option value="right" data-i18n="print.text.alignRight">Sağa</option>
               </select>
             </div>
             <div class="form-group">
-              <label data-i18n="print.text.fontSize">Font</label>
+              <label data-i18n="print.text.fontSize">Font Boyutu</label>
               <select id="textFontSize">
-                <option value="normal">Normal</option>
-                <option value="double">Çift</option>
+                <option value="normal" data-i18n="print.text.fontNormal">Normal</option>
+                <option value="double" data-i18n="print.text.fontDouble">Çift</option>
               </select>
             </div>
           </div>
@@ -188,40 +205,40 @@
           </button>
         </div>
 
-        <!-- QR -->
+        <!-- QR Kod Yazdır -->
         <div class="card">
           <div class="card-title">
             <span>⬛</span>
-            <span data-i18n="print.qr.title">QR Kod</span>
+            <span data-i18n="print.qr.title">QR Kod Yazdır</span>
           </div>
           
           <div class="form-group">
-            <label data-i18n="print.qr.jobId">İş ID</label>
+            <label data-i18n="print.qr.jobId">İş ID (boş bırak = otomatik)</label>
             <input type="text" id="qrJobId">
           </div>
           
           <div class="form-group">
             <label data-i18n="print.qr.data">QR İçeriği</label>
-            <input type="text" id="qrData">
+            <input type="text" id="qrData" data-i18n="print.qr.dataPlaceholder" placeholder="URL veya metin...">
           </div>
           
           <div class="form-group">
-            <label data-i18n="print.qr.label">Etiket</label>
-            <input type="text" id="qrLabel">
+            <label data-i18n="print.qr.label">Etiket (opsiyonel)</label>
+            <input type="text" id="qrLabel" data-i18n="print.qr.labelPlaceholder" placeholder="QR kodun altında görünür...">
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label data-i18n="print.qr.size">Boyut</label>
               <input type="range" id="qrSize" min="1" max="16" value="6">
-              <span id="qrSizeValue">6</span>
+              <span id="qrSizeValue" class="text-secondary">6</span>
             </div>
             <div class="form-group">
               <label data-i18n="print.qr.align">Hizalama</label>
               <select id="qrAlign">
-                <option value="left" data-i18n="print.text.alignLeft">Sola</option>
-                <option value="center" selected data-i18n="print.text.alignCenter">Ortala</option>
-                <option value="right" data-i18n="print.text.alignRight">Sağa</option>
+                <option value="left" data-i18n="print.qr.alignLeft">Sola</option>
+                <option value="center" selected data-i18n="print.qr.alignCenter">Ortala</option>
+                <option value="right" data-i18n="print.qr.alignRight">Sağa</option>
               </select>
             </div>
           </div>
@@ -231,7 +248,6 @@
               <input type="checkbox" id="qrAutoCut" checked>
               <span data-i18n="print.qr.autoCut">Otomatik Kes</span>
             </label>
-            <input type="hidden" id="qrErrorCorrection" value="M">
           </div>
           
           <button class="btn btn-primary" id="printQRBtn">
@@ -242,7 +258,7 @@
 
       </div>
 
-      <!-- Görsel -->
+      <!-- Görsel Yazdır (Tam genişlik) -->
       <div class="card mt-lg">
         <div class="card-title">
           <span>🖼️</span>
@@ -250,16 +266,22 @@
         </div>
         
         <div class="form-group">
-          <label data-i18n="print.image.jobId">İş ID</label>
+          <label data-i18n="print.image.jobId">İş ID (boş bırak = otomatik)</label>
           <input type="text" id="imageJobId">
         </div>
         
+        <!-- Dropzone -->
         <div class="dropzone" id="imageDropzone" data-accept="image/png,image/jpeg">
           <div class="dropzone-icon">🖼️</div>
-          <div class="dropzone-text" data-i18n="print.image.selectFile">Görsel Seç veya Sürükle-Bırak</div>
-          <div class="dropzone-hint" data-i18n="print.image.dragDrop">PNG, JPEG</div>
+          <div class="dropzone-text" data-i18n="print.image.selectFile">Görsel Seç</div>
+          <div class="dropzone-hint">
+            <span data-i18n="print.image.dragDrop">veya buraya sürükle-bırak</span>
+            <br>
+            <span data-i18n="print.image.supportedFormats">PNG, JPEG desteklenir</span>
+          </div>
         </div>
         
+        <!-- Önizleme -->
         <div class="mt-md text-center">
           <img id="imagePreview" class="hidden" style="max-width: 300px; max-height: 200px; border-radius: 8px;">
           <div id="imageFileName" class="text-secondary mt-sm"></div>
@@ -269,15 +291,17 @@
           <div class="form-group">
             <label data-i18n="print.image.align">Hizalama</label>
             <select id="imageAlign">
-              <option value="left" data-i18n="print.text.alignLeft">Sola</option>
-              <option value="center" selected data-i18n="print.text.alignCenter">Ortala</option>
-              <option value="right" data-i18n="print.text.alignRight">Sağa</option>
+              <option value="left" data-i18n="print.image.alignLeft">Sola</option>
+              <option value="center" selected data-i18n="print.image.alignCenter">Ortala</option>
+              <option value="right" data-i18n="print.image.alignRight">Sağa</option>
             </select>
           </div>
-          <label class="checkbox-label">
-            <input type="checkbox" id="imageAutoCut" checked>
-            <span data-i18n="print.image.autoCut">Otomatik Kes</span>
-          </label>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="imageAutoCut" checked>
+              <span data-i18n="print.image.autoCut">Otomatik Kes</span>
+            </label>
+          </div>
         </div>
         
         <button class="btn btn-primary" id="printImageBtn">
@@ -286,7 +310,7 @@
         </button>
       </div>
 
-      <!-- AI -->
+      <!-- Akıllı Yazdırma (AI) -->
       <div class="card mt-lg" style="border-left: 4px solid var(--warning);">
         <div class="card-title" style="color: var(--warning);">
           <span>🤖</span>
@@ -297,18 +321,18 @@
         </p>
         
         <div class="form-group">
-          <label data-i18n="print.smart.jobId">İş ID</label>
+          <label data-i18n="print.smart.jobId">İş ID (boş bırak = otomatik)</label>
           <input type="text" id="smartJobId">
         </div>
         
         <div class="form-group">
-          <label data-i18n="print.smart.hint">Fiş Tipi İpucu</label>
-          <input type="text" id="smartHint" data-i18n="print.smart.hintPlaceholder" placeholder="örn: kafe fişi">
+          <label data-i18n="print.smart.hint">Fiş Tipi İpucu (opsiyonel)</label>
+          <input type="text" id="smartHint" data-i18n="print.smart.hintPlaceholder" placeholder="örn: kafe fişi, market fişi">
         </div>
         
         <div class="form-group">
           <label data-i18n="print.smart.data">JSON Veri</label>
-          <textarea id="smartData" rows="6" class="font-mono"></textarea>
+          <textarea id="smartData" rows="6" class="font-mono" data-i18n="print.smart.dataPlaceholder" placeholder='{"müşteri": "Ahmet", "toplam": "50 TL"}'></textarea>
         </div>
         
         <div class="form-row">
@@ -321,10 +345,12 @@
               <option value="fr">FR</option>
             </select>
           </div>
-          <label class="checkbox-label">
-            <input type="checkbox" id="smartAutoCut" checked>
-            <span data-i18n="print.smart.autoCut">Otomatik Kes</span>
-          </label>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="smartAutoCut" checked>
+              <span data-i18n="print.smart.autoCut">Otomatik Kes</span>
+            </label>
+          </div>
         </div>
         
         <button class="btn btn-warning" id="printSmartBtn">
@@ -335,7 +361,9 @@
 
     </section>
 
-    <!-- LOGLAR -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         LOGLAR
+         ═══════════════════════════════════════════════════════════════ -->
     <section class="section">
       <div class="section-header" data-i18n="logs.title">LOGLAR</div>
       
@@ -370,7 +398,9 @@
             </thead>
             <tbody id="logsTableBody">
               <tr>
-                <td colspan="5" class="table-empty" data-i18n="logs.empty">Henüz log kaydı yok</td>
+                <td colspan="5" class="table-empty" data-i18n="logs.empty">
+                  Henüz log kaydı yok
+                </td>
               </tr>
             </tbody>
           </table>
@@ -385,9 +415,9 @@
     <p>
       🖨️ Termal Yazıcı Servisi v1.0.0
       <br>
-      <a href="/docs" style="color: var(--accent-primary);">API Dokümantasyonu</a>
+      <a href="/docs" style="color: var(--accent-primary); text-decoration: none;">API Dokümantasyonu</a>
       ·
-      <a href="https://github.com" style="color: var(--accent-primary);">GitHub</a>
+      <a href="https://github.com" style="color: var(--accent-primary); text-decoration: none;">GitHub</a>
     </p>
   </footer>
 
@@ -397,6 +427,7 @@
   <script src="/ui/js/components.js"></script>
   <script src="/ui/js/app.js"></script>
   
+  <!-- QR Size Slider Update -->
   <script>
     document.getElementById('qrSize')?.addEventListener('input', (e) => {
       document.getElementById('qrSizeValue').textContent = e.target.value;

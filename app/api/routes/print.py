@@ -1,13 +1,5 @@
 """
-Print endpoints — two clear options:
-
-  ── Option 1 (Standard — no external dependencies) ───────────────────────────
-  POST /print/text    — formatted text lines
-  POST /print/image   — base64 PNG/JPEG
-  POST /print/qr      — QR code with optional label
-
-  ── Option 2 (LLM-assisted — requires LLM_ENABLED=true in .env) ─────────────
-  POST /print/smart   — send structured JSON, LLM formats it as a receipt
+Yazdırma endpoint'leri
 """
 
 from fastapi import APIRouter, Depends
@@ -23,16 +15,16 @@ from app.models.requests import (
 from app.models.responses import JobResponse
 from app.services.print_service import get_print_service
 
-# ── Option 1: Standard print endpoints (no LLM, no external dependency) ──────
+# Ana yazdırma endpoint'leri
 router = APIRouter(
     prefix="/print",
-    tags=["🖨️ Print — Option 1 (Standard)"],
+    tags=["🖨️ Yazdırma"],
 )
 
-# ── Option 2: LLM-assisted endpoint (separate router + separate Swagger tag) ──
+# LLM destekli akıllı yazdırma (opsiyonel)
 llm_router = APIRouter(
     prefix="/print",
-    tags=["🤖 Print — Option 2 (LLM, optional)"],
+    tags=["🖨️ Yazdırma"],
 )
 
 
@@ -40,15 +32,19 @@ llm_router = APIRouter(
     "/text",
     response_model=JobResponse,
     dependencies=[Depends(verify_token)],
-    summary="Print text lines",
+    summary="📝 Metin Yazdır",
 )
 async def print_text(req: PrintTextRequest):
     """
-    **Option 1 — Standard (no external dependency)**
-
-    Print one or more formatted text lines.
-    Supports bold, underline, alignment (left/center/right), and font sizes.
-    Assign a `job_id` for idempotency — re-sending the same ID is a no-op.
+    Bir veya daha fazla metin satırını yazdırır.
+    
+    **Özellikler:**
+    - Kalın, altı çizili metin desteği
+    - Hizalama: sol, orta, sağ
+    - Font boyutu: normal, çift yükseklik, çift genişlik, çift
+    - Otomatik kağıt kesme
+    
+    **İpucu:** Aynı `job_id` ile tekrar gönderirseniz, işlem tekrarlanmaz (idempotent).
     """
     try:
         return await get_print_service().print_text(req)
@@ -60,14 +56,16 @@ async def print_text(req: PrintTextRequest):
     "/image",
     response_model=JobResponse,
     dependencies=[Depends(verify_token)],
-    summary="Print base64 image",
+    summary="🖼️ Görsel Yazdır",
 )
 async def print_image(req: PrintImageRequest):
     """
-    **Option 1 — Standard (no external dependency)**
-
-    Print a PNG or JPEG image supplied as a base64 string.
-    Image is auto-scaled to the printer's paper width (576px @ 203dpi).
+    PNG veya JPEG formatında base64 kodlanmış görsel yazdırır.
+    
+    **Özellikler:**
+    - Otomatik boyutlandırma (yazıcı genişliğine göre)
+    - Hizalama desteği
+    - Maksimum genişlik: 576px (80mm kağıt için)
     """
     try:
         return await get_print_service().print_image(req)
@@ -79,14 +77,17 @@ async def print_image(req: PrintImageRequest):
     "/qr",
     response_model=JobResponse,
     dependencies=[Depends(verify_token)],
-    summary="Print QR code",
+    summary="⬛ QR Kod Yazdır",
 )
 async def print_qr(req: PrintQRRequest):
     """
-    **Option 1 — Standard (no external dependency)**
-
-    Print a QR code using the printer's native ESC/POS GS(k command.
-    Optional `label` text is printed below the QR.
+    QR kod yazdırır (URL, metin veya herhangi bir veri).
+    
+    **Özellikler:**
+    - Boyut ayarlanabilir (1-16)
+    - Hata düzeltme seviyesi: L, M, Q, H
+    - Opsiyonel etiket (QR kodun altında görünür)
+    - Hizalama desteği
     """
     try:
         return await get_print_service().print_qr(req)
@@ -98,26 +99,27 @@ async def print_qr(req: PrintQRRequest):
     "/smart",
     response_model=JobResponse,
     dependencies=[Depends(verify_token)],
-    summary="LLM-assisted receipt from JSON data",
+    summary="🤖 Akıllı Yazdırma (AI)",
 )
 async def print_smart(req: SmartPrintRequest):
     """
-    **Option 2 — LLM-assisted (requires `LLM_ENABLED=true` in docker-compose.yml)**
-
-    Send arbitrary structured JSON data and let the LLM format it as a
-    human-readable receipt in the requested language.
-
-    Configuration (all via `docker-compose.yml` environment section):
-    - `LLM_ENABLED=true`
-    - `OPENROUTER_API_KEY=sk-or-...`
-    - `OPENROUTER_MODEL=mistralai/mistral-7b-instruct:free`
-
-    **When LLM is disabled:** falls back automatically to a simple key-value
-    receipt format — the endpoint always works, just without AI formatting.
-
-    > ⚠️ This feature uses an external API (OpenRouter). Disabled by default.
-    > Task note: *"Dış servis/anahtar gerektiren ücretli SDK kullanmayınız
-    > (gerekirse açıkça not ediniz)"* — documented here as required.
+    JSON veri gönder, yapay zeka fiş formatına dönüştürsün.
+    
+    **Nasıl Çalışır:**
+    1. Yapılandırılmış JSON verisi gönderirsiniz
+    2. AI, veriyi okunabilir fiş formatına dönüştürür
+    3. Fiş yazdırılır
+    
+    **Yapılandırma (.env dosyası):**
+    ```
+    LLM_ENABLED=true
+    GROQ_API_KEY=gsk_...
+    GROQ_MODEL=llama3-8b-8192
+    ```
+    
+    **Not:** LLM devre dışıysa, basit anahtar-değer formatında yazdırır.
+    
+    ⚠️ **Uyarı:** Bu özellik dış API kullanır (Groq). Varsayılan olarak kapalıdır.
     """
     try:
         return await get_print_service().print_smart(req)
