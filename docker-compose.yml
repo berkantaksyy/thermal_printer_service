@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  thermal-printer-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thermal_printer_service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Persist logs and failed jobs outside container
+      - ./logs:/app/logs
+      - ./data/failed_jobs:/app/data/failed_jobs
+    environment:
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8000
+      # ── Application ───────────────────────────────────────────────────────
+      - APP_DEBUG=false
+      - DEFAULT_LANGUAGE=tr
+      # ── Printer ───────────────────────────────────────────────────────────
+      - DEFAULT_CONNECTION_TYPE=usb
+      - LAN_HOST=${LAN_HOST:-192.168.1.100}
+      - LAN_PORT=${LAN_PORT:-9100}
+      - RECONNECT_MAX_RETRIES=5
+      - RECONNECT_BACKOFF_BASE=2
+      - RECONNECT_BACKOFF_MAX=60
+      # ── Logging ───────────────────────────────────────────────────────────
+      - LOG_DIR=/app/logs
+      - LOG_KEEP_DAYS=30
+      # ── LLM — Option 2 (disabled by default, no external key needed) ──────
+      # Set LLM_ENABLED=true and provide OPENROUTER_API_KEY to activate.
+      # The service works 100% without this. See POST /print/smart endpoint.
+      - LLM_ENABLED=${LLM_ENABLED:-false}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-mistralai/mistral-7b-instruct:free}
+      - OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+    # ── USB Printer access ─────────────────────────────────────────────────
+    # Uncomment the lines below to pass the physical USB printer through to
+    # the container. Find your device path with: lsusb
+    # devices:
+    #   - "/dev/bus/usb:/dev/bus/usb"
+    # privileged: true   # Required for USB device access on Linux
+    #
+    # Alternative (preferred): specify exact device:
+    # devices:
+    #   - "/dev/usb/lp0:/dev/usb/lp0"
+    # ─────────────────────────────────────────────────────────────────────
+    networks:
+      - printer_net
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  printer_net:
+    driver: bridge
