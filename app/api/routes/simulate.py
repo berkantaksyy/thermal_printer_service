@@ -13,7 +13,14 @@ from pydantic import BaseModel, Field
 from app.api.deps import verify_token
 from app.core.printer import get_printer
 from app.core.error_handler import PrinterErrorCode
-from tests.mock_printer import MockPrinter
+
+# Import MockPrinter only if available (for testing)
+try:
+    from tests.mock_printer import MockPrinter
+    MOCK_PRINTER_AVAILABLE = True
+except ImportError:
+    MockPrinter = None
+    MOCK_PRINTER_AVAILABLE = False
 
 router = APIRouter(tags=["Simülasyon"])
 
@@ -186,7 +193,7 @@ async def simulate_error(request: SimulateRequest):
         )
     
     # MockPrinter kontrolü
-    if not isinstance(printer, MockPrinter):
+    if not MOCK_PRINTER_AVAILABLE or not isinstance(printer, MockPrinter):
         raise HTTPException(
             status_code=400,
             detail={
@@ -258,7 +265,7 @@ async def get_simulate_status():
         )
     
     # MockPrinter kontrolü
-    is_mock = isinstance(printer, MockPrinter)
+    is_mock = MOCK_PRINTER_AVAILABLE and isinstance(printer, MockPrinter)
     
     if not is_mock:
         return SimulateStatusResponse(

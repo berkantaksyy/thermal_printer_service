@@ -184,22 +184,30 @@ class TestRunner {
    * Action: Simulate error
    */
   async actionSimulate(errorType, operations) {
-    const response = await api.post('/simulate', {
-      error_type: errorType,
-      operations: operations
-    });
-    return { status: response.status, data: response.data };
+    try {
+      const data = await api.post('/simulate', {
+        error_type: errorType,
+        operations: operations
+      });
+      return { status: 200, data };
+    } catch (error) {
+      return { status: error.status || 500, data: error.data || {} };
+    }
   }
 
   /**
    * Action: Clear simulation
    */
   async actionClearSimulation() {
-    const response = await api.post('/simulate', {
-      error_type: null,
-      operations: 0
-    });
-    return { status: response.status, data: response.data };
+    try {
+      const data = await api.post('/simulate', {
+        error_type: null,
+        operations: 0
+      });
+      return { status: 200, data };
+    } catch (error) {
+      return { status: error.status || 500, data: error.data || {} };
+    }
   }
 
   /**
@@ -207,18 +215,18 @@ class TestRunner {
    */
   async actionPrintText() {
     try {
-      const response = await api.post('/print/text', {
+      const data = await api.post('/print/text', {
         lines: [
           { text: 'Test Print', bold: false, align: 'left', font_size: 'normal' }
         ],
         cut: false
       });
-      return { status: response.status, data: response.data };
+      return { status: 200, data };
     } catch (error) {
-      // API returns error status codes, capture them
-      return { 
-        status: error.response?.status || 500, 
-        data: error.response?.data || { error: error.message }
+      // API throws APIError with status code
+      return {
+        status: error.status || 500,
+        data: error.data || { error: error.message }
       };
     }
   }
@@ -227,8 +235,12 @@ class TestRunner {
    * Action: Check status
    */
   async actionCheckStatus() {
-    const response = await api.get('/status');
-    return { status: response.status, data: response.data };
+    try {
+      const data = await api.get('/status');
+      return { status: 200, data };
+    } catch (error) {
+      return { status: error.status || 500, data: error.data || {} };
+    }
   }
 
   /**
