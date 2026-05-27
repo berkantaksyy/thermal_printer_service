@@ -1,0 +1,55 @@
+{
+  "header": {
+    "title": "API de service d'imprimante thermique",
+    "subtitle": "Documentation API REST professionnelle pour Cashino KP-300 / KP-301H",
+    "version": "v1.0.0"
+  },
+  "infoCards": {
+    "connection": {
+      "title": "🔌 Connexion",
+      "description": "Connexion d'imprimante via USB et LAN. Support de reconnexion automatique."
+    },
+    "printing": {
+      "title": "🖨️ Impression",
+      "description": "Texte, image, code QR et fonctionnalités d'impression intelligente alimentées par l'IA."
+    },
+    "multilang": {
+      "title": "🌍 Multilingue",
+      "description": "Support des langues turc, anglais, allemand et français."
+    },
+    "monitoring": {
+      "title": "📊 Surveillance",
+      "description": "Journalisation détaillée, gestion de file d'attente et suivi d'état en temps réel."
+    }
+  },
+  "languageSelector": {
+    "label": "Langue:"
+  },
+  "tags": {
+    "connection": "Connexion",
+    "printing": "Impression",
+    "status": "Statut",
+    "health": "Santé",
+    "logs": "Journaux",
+    "reprint": "Réimprimer"
+  },
+  "common": {
+    "tryItOut": "Essayer",
+    "execute": "Exécuter",
+    "cancel": "Annuler",
+    "clear": "Effacer",
+    "authorize": "Autoriser",
+    "close": "Fermer",
+    "parameters": "Paramètres",
+    "requestBody": "Corps de la requête",
+    "responses": "Réponses",
+    "example": "Exemple",
+    "schema": "Schéma",
+    "description": "Description",
+    "required": "Requis",
+    "optional": "Optionnel",
+    "type": "Type",
+    "format": "Format",
+    "default": "Par défaut"
+  }
+}

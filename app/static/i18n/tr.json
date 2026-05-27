@@ -1,0 +1,55 @@
+{
+  "header": {
+    "title": "Termal Yazıcı Servisi API",
+    "subtitle": "Cashino KP-300 / KP-301H için profesyonel REST API dokümantasyonu",
+    "version": "v1.0.0"
+  },
+  "infoCards": {
+    "connection": {
+      "title": "🔌 Bağlantı",
+      "description": "USB ve LAN üzerinden yazıcı bağlantısı. Otomatik yeniden bağlanma desteği."
+    },
+    "printing": {
+      "title": "🖨️ Yazdırma",
+      "description": "Metin, görsel, QR kod ve AI destekli akıllı yazdırma özellikleri."
+    },
+    "multilang": {
+      "title": "🌍 Çoklu Dil",
+      "description": "Türkçe, İngilizce, Almanca ve Fransızca dil desteği."
+    },
+    "monitoring": {
+      "title": "📊 İzleme",
+      "description": "Detaylı loglama, kuyruk yönetimi ve gerçek zamanlı durum takibi."
+    }
+  },
+  "languageSelector": {
+    "label": "Dil:"
+  },
+  "tags": {
+    "connection": "Bağlantı",
+    "printing": "Yazdırma",
+    "status": "Durum",
+    "health": "Sağlık",
+    "logs": "Loglar",
+    "reprint": "Yeniden Yazdır"
+  },
+  "common": {
+    "tryItOut": "Dene",
+    "execute": "Çalıştır",
+    "cancel": "İptal",
+    "clear": "Temizle",
+    "authorize": "Yetkilendir",
+    "close": "Kapat",
+    "parameters": "Parametreler",
+    "requestBody": "İstek Gövdesi",
+    "responses": "Yanıtlar",
+    "example": "Örnek",
+    "schema": "Şema",
+    "description": "Açıklama",
+    "required": "Zorunlu",
+    "optional": "Opsiyonel",
+    "type": "Tip",
+    "format": "Format",
+    "default": "Varsayılan"
+  }
+}

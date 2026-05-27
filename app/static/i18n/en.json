@@ -1,0 +1,55 @@
+{
+  "header": {
+    "title": "Thermal Printer Service API",
+    "subtitle": "Professional REST API documentation for Cashino KP-300 / KP-301H",
+    "version": "v1.0.0"
+  },
+  "infoCards": {
+    "connection": {
+      "title": "🔌 Connection",
+      "description": "Printer connection via USB and LAN. Automatic reconnection support."
+    },
+    "printing": {
+      "title": "🖨️ Printing",
+      "description": "Text, image, QR code and AI-powered smart printing features."
+    },
+    "multilang": {
+      "title": "🌍 Multi-language",
+      "description": "Turkish, English, German and French language support."
+    },
+    "monitoring": {
+      "title": "📊 Monitoring",
+      "description": "Detailed logging, queue management and real-time status tracking."
+    }
+  },
+  "languageSelector": {
+    "label": "Language:"
+  },
+  "tags": {
+    "connection": "Connection",
+    "printing": "Printing",
+    "status": "Status",
+    "health": "Health",
+    "logs": "Logs",
+    "reprint": "Reprint"
+  },
+  "common": {
+    "tryItOut": "Try it out",
+    "execute": "Execute",
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "authorize": "Authorize",
+    "close": "Close",
+    "parameters": "Parameters",
+    "requestBody": "Request body",
+    "responses": "Responses",
+    "example": "Example",
+    "schema": "Schema",
+    "description": "Description",
+    "required": "Required",
+    "optional": "Optional",
+    "type": "Type",
+    "format": "Format",
+    "default": "Default"
+  }
+}

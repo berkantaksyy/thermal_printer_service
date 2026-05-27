@@ -119,36 +119,36 @@
 </head>
 <body>
     <div class="language-selector">
-        <span style="font-size: 0.875rem; color: #64748b;">Dil:</span>
-        <button class="active" onclick="setLanguage('tr')">TR</button>
-        <button onclick="setLanguage('en')">EN</button>
-        <button onclick="setLanguage('de')">DE</button>
-        <button onclick="setLanguage('fr')">FR</button>
+        <span id="lang-label" style="font-size: 0.875rem; color: #64748b;">Dil:</span>
+        <button class="active" onclick="changeLanguage('tr')">TR</button>
+        <button onclick="changeLanguage('en')">EN</button>
+        <button onclick="changeLanguage('de')">DE</button>
+        <button onclick="changeLanguage('fr')">FR</button>
     </div>
     
     <div id="swagger-ui">
         <div class="custom-header">
-            <h1>Termal Yazıcı Servisi API</h1>
-            <p>Cashino KP-300 / KP-301H için profesyonel REST API dokümantasyonu</p>
-            <span class="badge">v1.0.0</span>
+            <h1 id="header-title">Termal Yazıcı Servisi API</h1>
+            <p id="header-subtitle">Cashino KP-300 / KP-301H için profesyonel REST API dokümantasyonu</p>
+            <span class="badge" id="header-version">v1.0.0</span>
         </div>
         
         <div class="info-cards">
             <div class="info-card">
-                <h3>🔌 Bağlantı</h3>
-                <p>USB ve LAN üzerinden yazıcı bağlantısı. Otomatik yeniden bağlanma desteği.</p>
+                <h3 id="card-connection-title">🔌 Bağlantı</h3>
+                <p id="card-connection-desc">USB ve LAN üzerinden yazıcı bağlantısı. Otomatik yeniden bağlanma desteği.</p>
             </div>
             <div class="info-card">
-                <h3>🖨️ Yazdırma</h3>
-                <p>Metin, görsel, QR kod ve AI destekli akıllı yazdırma özellikleri.</p>
+                <h3 id="card-printing-title">🖨️ Yazdırma</h3>
+                <p id="card-printing-desc">Metin, görsel, QR kod ve AI destekli akıllı yazdırma özellikleri.</p>
             </div>
             <div class="info-card">
-                <h3>🌍 Çoklu Dil</h3>
-                <p>Türkçe, İngilizce, Almanca ve Fransızca dil desteği.</p>
+                <h3 id="card-multilang-title">🌍 Çoklu Dil</h3>
+                <p id="card-multilang-desc">Türkçe, İngilizce, Almanca ve Fransızca dil desteği.</p>
             </div>
             <div class="info-card">
-                <h3>📊 İzleme</h3>
-                <p>Detaylı loglama, kuyruk yönetimi ve gerçek zamanlı durum takibi.</p>
+                <h3 id="card-monitoring-title">📊 İzleme</h3>
+                <p id="card-monitoring-desc">Detaylı loglama, kuyruk yönetimi ve gerçek zamanlı durum takibi.</p>
             </div>
         </div>
     </div>
@@ -156,9 +156,89 @@
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
     <script>
+        // Dil çevirileri
+        let translations = {};
+        let currentLang = localStorage.getItem('api_lang') || 'tr';
+        
+        // Dil dosyasını yükle
+        async function loadTranslations(lang) {
+            try {
+                const response = await fetch(`/static/i18n/${lang}.json`);
+                translations = await response.json();
+                updateUIText();
+            } catch (error) {
+                console.error('Dil dosyası yüklenemedi:', error);
+            }
+        }
+        
+        // UI metinlerini güncelle
+        function updateUIText() {
+            if (!translations.header) return;
+            
+            // Header
+            document.getElementById('header-title').textContent = translations.header.title;
+            document.getElementById('header-subtitle').textContent = translations.header.subtitle;
+            document.getElementById('header-version').textContent = translations.header.version;
+            
+            // Info Cards
+            document.getElementById('card-connection-title').textContent = translations.infoCards.connection.title;
+            document.getElementById('card-connection-desc').textContent = translations.infoCards.connection.description;
+            document.getElementById('card-printing-title').textContent = translations.infoCards.printing.title;
+            document.getElementById('card-printing-desc').textContent = translations.infoCards.printing.description;
+            document.getElementById('card-multilang-title').textContent = translations.infoCards.multilang.title;
+            document.getElementById('card-multilang-desc').textContent = translations.infoCards.multilang.description;
+            document.getElementById('card-monitoring-title').textContent = translations.infoCards.monitoring.title;
+            document.getElementById('card-monitoring-desc').textContent = translations.infoCards.monitoring.description;
+            
+            // Language selector label
+            document.getElementById('lang-label').textContent = translations.languageSelector.label;
+            
+            // HTML lang attribute
+            document.documentElement.lang = currentLang;
+        }
+        
+        // Dil değiştir
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('api_lang', lang);
+            
+            // Buton durumlarını güncelle
+            const buttons = document.querySelectorAll('.language-selector button');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === lang.toUpperCase()) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Çevirileri yükle
+            loadTranslations(lang);
+            
+            // Swagger UI'ı yeni dil ile yeniden yükle
+            if (window.ui) {
+                window.ui.specActions.updateUrl(`/openapi.json?language=${lang}`);
+                window.ui.specActions.download();
+            }
+        }
+        
+        // Sayfa yüklendiğinde
         window.onload = function() {
+            // İlk dil yüklemesi
+            loadTranslations(currentLang);
+            
+            // Aktif dil butonunu işaretle
+            const buttons = document.querySelectorAll('.language-selector button');
+            buttons.forEach(btn => {
+                if (btn.textContent === currentLang.toUpperCase()) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Swagger UI başlat
             const ui = SwaggerUIBundle({
-                url: "/openapi.json",
+                url: `/openapi.json?language=${currentLang}`,
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 presets: [
@@ -185,6 +265,11 @@
                     if (token && !request.url.includes('/health')) {
                         request.headers['Authorization'] = `Bearer ${token}`;
                     }
+                    // Dil parametresi ekleme
+                    if (currentLang && !request.url.includes('language=')) {
+                        const separator = request.url.includes('?') ? '&' : '?';
+                        request.url += `${separator}language=${currentLang}`;
+                    }
                     return request;
                 },
                 onComplete: () => {
@@ -202,20 +287,54 @@
                             }, 500);
                         });
                     }
+                    
+                    // Swagger UI içindeki metinleri çevir
+                    translateSwaggerUI();
                 }
             });
 
             window.ui = ui;
         };
         
-        function setLanguage(lang) {
-            // Dil değiştirme fonksiyonu
-            const buttons = document.querySelectorAll('.language-selector button');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+        // Swagger UI içindeki metinleri çevir
+        function translateSwaggerUI() {
+            if (!translations.common) return;
             
-            // API'ye dil parametresi eklenebilir
-            console.log('Dil değiştirildi:', lang);
+            // Try it out butonları
+            setTimeout(() => {
+                document.querySelectorAll('.try-out__btn').forEach(btn => {
+                    if (btn.textContent.includes('Try it out') || btn.textContent.includes('Dene')) {
+                        btn.textContent = translations.common.tryItOut;
+                    }
+                    if (btn.textContent.includes('Cancel') || btn.textContent.includes('İptal')) {
+                        btn.textContent = translations.common.cancel;
+                    }
+                });
+                
+                // Execute butonları
+                document.querySelectorAll('.execute').forEach(btn => {
+                    btn.textContent = translations.common.execute;
+                });
+                
+                // Authorize butonu
+                document.querySelectorAll('.authorize').forEach(btn => {
+                    const span = btn.querySelector('span');
+                    if (span) span.textContent = translations.common.authorize;
+                });
+                
+                // Parametreler başlığı
+                document.querySelectorAll('.opblock-section-header h4').forEach(h4 => {
+                    if (h4.textContent.includes('Parameters')) {
+                        h4.textContent = translations.common.parameters;
+                    }
+                    if (h4.textContent.includes('Request body')) {
+                        h4.textContent = translations.common.requestBody;
+                    }
+                    if (h4.textContent.includes('Responses')) {
+                        h4.textContent = translations.common.responses;
+                    }
+                });
+            }, 1000);
         }
     </script>
 </body>

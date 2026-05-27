@@ -7,13 +7,15 @@ Cashino KP-300 / KP-301H REST API Service
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import os
 
 from app.core.config import get_settings
+from app.core.i18n_openapi import get_translated_openapi, TRANSLATIONS
+from app.core.endpoint_i18n import get_endpoint_translation
 from app.api.routes import connection, print as print_router, status, logs, health, reprint
 from app.api.routes.print import llm_router as print_llm_router
 
@@ -155,6 +157,69 @@ Varsayılan dil `.env` dosyasında `DEFAULT_LANGUAGE` ile ayarlanır.
     if os.path.isdir("ui"):
         app.mount("/ui", StaticFiles(directory="ui", html=True), name="ui")
 
+    # ── Custom OpenAPI with i18n ──────────────────────────────────────────────
+    @app.get("/openapi.json", include_in_schema=False)
+    async def get_openapi_with_lang(language: str = Query("tr", description="API dili: tr, en, de, fr")):
+        """Dile göre özelleştirilmiş OpenAPI spec döndürür"""
+        from fastapi.openapi.utils import get_openapi
+        
+        # Dil çevirisini al
+        trans = get_translated_openapi(language)
+        
+        # OpenAPI spec'ini oluştur (cache kullanmıyoruz - her seferinde yeniden oluştur)
+        # Bu sayede güncellemeler anında yansır
+        if True:  # Her zaman yeniden oluştur
+            openapi_schema = get_openapi(
+                title=trans["title"],
+                version=settings.app_version,
+                description=trans["description"],
+                routes=app.routes,
+            )
+            
+            # Tag açıklamalarını çevir
+            if "tags" in openapi_schema:
+                for tag in openapi_schema["tags"]:
+                    tag_name = tag["name"]
+                    if tag_name in trans["tags"]:
+                        tag["description"] = trans["tags"][tag_name]
+            
+            # Endpoint açıklamalarını çevir
+            if "paths" in openapi_schema:
+                for path, methods in openapi_schema["paths"].items():
+                    for method, details in methods.items():
+                        if method in ["get", "post", "put", "delete", "patch"]:
+                            # Logs endpoints
+                            if path == "/logs" and method == "get":
+                                t = get_endpoint_translation("logs", "get_logs", language)
+                                details["summary"] = t["summary"]
+                                details["description"] = t["description"]
+                                if "responses" in details and "200" in details["responses"]:
+                                    details["responses"]["200"]["description"] = t["response_description"]
+                            
+                            elif path == "/logs/export" and method == "get":
+                                t = get_endpoint_translation("logs", "export_logs", language)
+                                details["summary"] = t["summary"]
+                                details["description"] = t["description"]
+                                if "responses" in details and "200" in details["responses"]:
+                                    details["responses"]["200"]["description"] = t["response_description"]
+                            
+                            elif path == "/logs/failed" and method == "get":
+                                t = get_endpoint_translation("logs", "list_failed_jobs", language)
+                                details["summary"] = t["summary"]
+                                details["description"] = t["description"]
+                                if "responses" in details and "200" in details["responses"]:
+                                    details["responses"]["200"]["description"] = t["response_description"]
+                            
+                            # Reprint endpoint
+                            elif path == "/reprint" and method == "post":
+                                t = get_endpoint_translation("reprint", "reprint", language)
+                                details["summary"] = t["summary"]
+                                details["description"] = t["description"]
+                                if "responses" in details and "200" in details["responses"]:
+                                    details["responses"]["200"]["description"] = t["response_description"]
+            
+        return openapi_schema
+    
     # ── Custom Swagger UI ─────────────────────────────────────────────────────
     @app.get("/docs", include_in_schema=False)
     async def custom_swagger_ui():
