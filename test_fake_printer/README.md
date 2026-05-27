@@ -1,129 +1,137 @@
-# Sahte Termal Yazıcı Simülatörü
+# 🖨️ test_fake_printer/ — TCP Sahte Yazıcı Simülatörü
 
-Cashino KP-300/KP-301H termal yazıcılarını simüle eden TCP/IP server. Gerçek yazıcı donanımı olmadan [`thermal_printer_service`](../README.md) sistemini test etmek için kullanılır.
+<div align="center">
 
-## 🚀 Hızlı Başlangıç
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python)](https://python.org)
+[![TCP](https://img.shields.io/badge/TCP-Port%209100-orange?style=flat-square)](.)
+[![ESC/POS](https://img.shields.io/badge/ESC%2FPOS-Parsed-green?style=flat-square)](.)
+
+[🇹🇷 Türkçe](#türkçe) · [🇬🇧 English](#english) · [🇩🇪 Deutsch](#deutsch) · [🇫🇷 Français](#français)
+
+</div>
+
+---
+
+<a id="türkçe"></a>
+
+## 🇹🇷 Türkçe
+
+### Nedir?
+
+`fake_printer.py`, fiziksel Cashino KP-300/KP-301H yazıcısı olmadan API servisini test etmek için geliştirilmiş bir TCP sunucusudur. Port 9100'de dinler ve gerçek termal yazıcı gibi davranır.
+
+Gerçek yazıcı olmadan:
+- API entegrasyon testleri yapabilirsiniz
+- ESC/POS komutlarını terminal çıktısı olarak görebilirsiniz
+- Hata senaryolarını simüle edebilirsiniz
+
+### Hızlı Başlangıç
 
 ```bash
-# Basit kullanım (parse modu)
+cd test_fake_printer
+
+# Temel mod (sadece TCP sunucu)
 python3 fake_printer.py
 
-# Belirli bir modda çalıştır
+# ESC/POS komutlarını göster
+python3 fake_printer.py --mode parse
+
+# Tam simülasyon (hata senaryoları dahil)
 python3 fake_printer.py --mode simulate
 
-# Yardım
-python3 fake_printer.py --help
+# Tüm testleri otomatik çalıştır
+./run_all_tests.sh
+
+# Hızlı kurulum (servis + fake yazıcı)
+./quick_start.sh
 ```
 
-## 📋 Özellikler
+### Çalışma Modları
 
-- ✅ **3 Çalışma Modu**: Simple, Parse, Simulate
-- ✅ **ESC/POS Komut Desteği**: Metin, görsel, QR kod, kesme, formatlama
-- ✅ **Status Query**: DLE EOT komutlarına yanıt verme
-- ✅ **Hata Simülasyonu**: PAPER_OUT, COVER_OPEN, OVERHEAT, PAPER_JAM
-- ✅ **Port 9100**: RAW printing standart portu
-- ✅ **Çoklu Encoding**: cp857 (Türkçe), utf-8, latin-1
-- ✅ **Renkli Çıktı**: ANSI renk kodları ile okunabilir loglar
-- ✅ **Log Dosyası**: Tüm işlemleri dosyaya kaydetme
+#### `--mode simple` (varsayılan)
+Gelen bağlantıları kabul eder ve veriyi yoksayar. Sadece bağlantı testleri için.
 
-## 🎮 Çalışma Modları
+```
+[FAKE PRINTER] Listening on 127.0.0.1:9100
+[FAKE PRINTER] Client connected: ('127.0.0.1', 54321)
+[FAKE PRINTER] Received 42 bytes
+[FAKE PRINTER] Client disconnected
+```
 
-### 1. Simple Mode (Basit)
+#### `--mode parse`
+Gelen ESC/POS baytlarını ayrıştırır ve insan okunabilir formatta terminale yazar.
 
-Ham byte verilerini hex ve ASCII formatında gösterir. Hızlı bağlantı testi için idealdir.
+```
+[FAKE PRINTER] Listening on 127.0.0.1:9100
+[FAKE PRINTER] Client connected
+[PARSER] INIT: ESC @
+[PARSER] ALIGN: Center (ESC a 1)
+[PARSER] BOLD ON: ESC E 1
+[PARSER] TEXT: "ACO RECYCLING"
+[PARSER] BOLD OFF: ESC E 0
+[PARSER] TEXT: "Makinesi: ACO-TEST-0001"
+[PARSER] QR CODE: data="https://aco.example.com/r/12345", size=6
+[PARSER] CUT: Full cut (GS V 0)
+```
 
+#### `--mode simulate`
+Gerçek yazıcı davranışını simüle eder. Özel komutlar ile 6 farklı hata senaryosu tetiklenebilir.
+
+### Hata Simülasyonu
+
+`simulate` modunda aşağıdaki özel komutlar TCP üzerinden gönderilebilir:
+
+| Komut | Açıklama |
+|-------|----------|
+| `SIMULATE_PAPER_OUT` | Kağıt bitti hatası tetikle |
+| `SIMULATE_PAPER_JAM` | Kağıt sıkışması hatası tetikle |
+| `SIMULATE_COVER_OPEN` | Kapak açık hatası tetikle |
+| `SIMULATE_OVERHEAT` | Aşırı ısınma hatası tetikle |
+| `SIMULATE_COMM_ERROR` | İletişim hatası tetikle |
+| `SIMULATE_CLEAR` | Tüm hataları temizle, normal çalışmaya dön |
+
+**Örnek kullanım:**
 ```bash
-python3 fake_printer.py --mode simple
+# Simülatörü başlat
+python3 fake_printer.py --mode simulate
+
+# Farklı terminalde hata tetikle
+echo -n "SIMULATE_PAPER_OUT" | nc 127.0.0.1 9100
+
+# API'ye yazdırma isteği gönder → 503 alacaksınız
+curl -X POST http://localhost:8000/print/text \
+  -H "Authorization: Bearer change-me-secret-token" \
+  -H "Content-Type: application/json" \
+  -d '{"lines": [{"text": "Test"}], "cut": true}'
+
+# Hatayı temizle
+echo -n "SIMULATE_CLEAR" | nc 127.0.0.1 9100
+
+# Tekrar dene → başarılı
 ```
 
-**Çıktı Örneği:**
+### Komut Satırı Seçenekleri
+
 ```
-[RECV 15 bytes] 1B 40 1B 61 01 48 65 6C 6C 6F 0A 1D 56 00
-[ASCII] .@.a.Hello...V.
+python3 fake_printer.py [seçenekler]
+
+  --host HOST       Dinleme adresi (varsayılan: 127.0.0.1)
+  --port PORT       Dinleme portu  (varsayılan: 9100)
+  --mode MODE       Çalışma modu: simple | parse | simulate  (varsayılan: simple)
+  --delay SECS      Her yanıt için gecikme (yavaş yazıcı simülasyonu)
+  --verbose         Detaylı çıktı
 ```
 
-### 2. Parse Mode (Gelişmiş) - Varsayılan
+### Tam Entegrasyon Test Akışı (3 Terminal)
 
-ESC/POS komutlarını parse eder ve anlamlı şekilde gösterir.
-
+**Terminal 1 — Sahte Yazıcı:**
 ```bash
+cd test_fake_printer
 python3 fake_printer.py --mode parse
 ```
 
-**Çıktı Örneği:**
-```
-[+] Bağlantı: 192.168.1.50:54321
-[CMD] ESC @ - Yazıcı başlatıldı
-[CMD] ESC a 1 - Hizalama: CENTER
-[CMD] GS ! 0x11 - Font: Double (2x2)
-[TEXT] "ACO RECYCLING"
-[CMD] LF - Satır atla
-[CUT] GS V 0 - Kağıt kes (Full)
-```
-
-### 3. Simulate Mode (Tam Simülasyon)
-
-Gerçek yazıcı gibi davranır, status query'lere yanıt verir, interaktif hata simülasyonu yapar.
-
+**Terminal 2 — API Servisi:**
 ```bash
-python3 fake_printer.py --mode simulate
-```
-
-**Çıktı Örneği:**
-```
-[+] Bağlantı: 192.168.1.50:54321
-[STATUS] Kağıt: ✓ OK | Kapak: ✓ OK | Sıcaklık: ✓ OK
-[CMD] ESC @ - Yazıcı başlatıldı
-[TEXT] "ACO RECYCLING"
-[PRINT] ✓ 45 byte yazdırıldı
-[CUT] ✓ Kağıt kesildi
-
-Hata simülasyonu için tuşlar:
-  [P] Paper Out  [C] Cover Open  [H] Overheat  [R] Reset
-```
-
-## 🔧 Komut Satırı Seçenekleri
-
-```bash
-python3 fake_printer.py [OPTIONS]
-
-Seçenekler:
-  --mode {simple,parse,simulate}  Çalışma modu (varsayılan: parse)
-  --host HOST                     Dinlenecek IP (varsayılan: 0.0.0.0)
-  --port PORT                     Dinlenecek port (varsayılan: 9100)
-  --encoding {cp857,utf-8,latin-1} Metin encoding (varsayılan: cp857)
-  --log FILE                      Log dosyası (opsiyonel)
-  --no-color                      Renkli çıktıyı devre dışı bırak
-  --help                          Yardım mesajı
-```
-
-## 🧪 Test Senaryoları
-
-### Test 1: Basit Bağlantı Testi
-
-```bash
-# Terminal 1
-python3 fake_printer.py --mode simple
-
-# Terminal 2
-echo "Test" | nc localhost 9100
-```
-
-**Beklenen Çıktı (Terminal 1):**
-```
-[+] Bağlantı: 127.0.0.1:xxxxx
-[RECV 5 bytes] 54 65 73 74 0A
-[ASCII] Test.
-```
-
-### Test 2: API ile Metin Yazdırma
-
-```bash
-# Terminal 1: Sahte yazıcıyı başlat
-python3 fake_printer.py --mode parse
-
-# Terminal 2: .env dosyasını güncelle
-cd ..
 cat > .env << EOF
 DEFAULT_CONNECTION_TYPE=lan
 LAN_HOST=127.0.0.1
@@ -131,321 +139,280 @@ LAN_PORT=9100
 API_BEARER_TOKEN=change-me-secret-token
 EOF
 
-# Terminal 3: API servisini başlat
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
 
-# Terminal 4: Test isteği gönder
+**Terminal 3 — Test İstekleri:**
+```bash
+# Bağlan
+curl -X POST http://localhost:8000/connect \
+  -H "Authorization: Bearer change-me-secret-token" \
+  -H "Content-Type: application/json" \
+  -d '{"connection_type": "lan"}'
+
+# Metin yazdır
 curl -X POST http://localhost:8000/print/text \
   -H "Authorization: Bearer change-me-secret-token" \
   -H "Content-Type: application/json" \
   -d '{
     "lines": [
-      {"text": "TEST FİŞİ", "bold": true, "align": "center", "font_size": "double"},
-      {"text": "Tarih: 2026-05-27", "align": "center"},
-      {"text": "Tutar: 100.00 TL", "bold": true, "align": "right"}
+      {"text": "TEST", "bold": true, "align": "center"},
+      {"text": "Merhaba Dünya!"}
     ],
     "cut": true
   }'
-```
 
-**Beklenen Çıktı (Terminal 1):**
-```
-[+] Bağlantı: 127.0.0.1:xxxxx
-[CMD] ESC @ - Yazıcı başlatıldı
-[CMD] ESC a 1 - Hizalama: CENTER
-[CMD] GS ! 0x11 - Font: Double (2x2)
-[CMD] ESC E 1 - Kalın: ON
-[TEXT] "TEST FİŞİ"
-[CMD] LF - Satır atla
-[CMD] ESC E 0 - Kalın: OFF
-[CMD] GS ! 0x00 - Font: Normal (1x1)
-[CMD] ESC a 1 - Hizalama: CENTER
-[TEXT] "Tarih: 2026-05-27"
-[CMD] LF - Satır atla
-[CMD] ESC a 2 - Hizalama: RIGHT
-[CMD] ESC E 1 - Kalın: ON
-[TEXT] "Tutar: 100.00 TL"
-[CMD] LF - Satır atla
-[CMD] ESC d 3 - 3 satır besle
-[CUT] GS V 0 - Kağıt kes (Full)
-```
-
-### Test 3: QR Kod Yazdırma
-
-```bash
-# Terminal 1
-python3 fake_printer.py --mode parse
-
-# Terminal 2
+# QR kod yazdır
 curl -X POST http://localhost:8000/print/qr \
   -H "Authorization: Bearer change-me-secret-token" \
   -H "Content-Type: application/json" \
-  -d '{
-    "data": "https://example.com/receipt/12345",
-    "size": 6,
-    "error_correction": "M",
-    "label": "Detaylar için tarayın",
-    "cut": true
-  }'
+  -d '{"data": "https://github.com/berkantaksyy", "size": 6, "cut": true}'
 ```
 
-**Beklenen Çıktı:**
-```
-[+] Bağlantı: 127.0.0.1:xxxxx
-[CMD] ESC @ - Yazıcı başlatıldı
-[CMD] ESC a 1 - Hizalama: CENTER
-[QR] Model ayarlandı: Model 2
-[QR] Boyut: 6
-[QR] Hata düzeltme: M
-[QR] Data: "https://example.com/receipt/12345" (35 bytes)
-[QR] Yazdır komutu
-[CMD] LF - Satır atla
-[TEXT] "Detaylar için tarayın"
-[CMD] LF - Satır atla
-[CUT] GS V 0 - Kağıt kes (Full)
-```
-
-### Test 4: Hata Simülasyonu
+### `run_all_tests.sh` — Otomatik Test Scripti
 
 ```bash
-# Terminal 1: Simulate modunda başlat
-python3 fake_printer.py --mode simulate
+./run_all_tests.sh
+# ✅ Health check
+# ✅ Print text
+# ✅ Print QR code
+# ✅ Print image
+# ✅ Get status
+# ✅ Get logs
+# ✅ Error simulation (PAPER_OUT → 503)
+# ✅ Error recovery (SIMULATE_CLEAR → 200)
+# ✅ Idempotency (duplicate job_id)
+# ✅ Reprint (failed job)
+```
 
-# Konsolda 'P' tuşuna bas (Paper Out simüle et)
+### `quick_start.sh` — Tek Komut Kurulum
 
-# Terminal 2: Yazdırma isteği gönder
+```bash
+./quick_start.sh
+# ① Gereksinimler kontrol edilir (Python, curl, nc)
+# ② .env dosyası oluşturulur
+# ③ Sahte yazıcı arka planda başlatılır (port 9100)
+# ④ API servisi başlatılır (port 8000)
+# ⑤ Bağlantı testi yapılır
+# ⑥ Örnek yazdırma isteği gönderilir
+```
+
+### Fark: `mock_printer.py` vs `fake_printer.py`
+
+| | `mock_printer.py` (`tests/`) | `fake_printer.py` |
+|---|---|---|
+| **Kullanım amacı** | pytest otomatik testleri | Manuel entegrasyon testi |
+| **Protokol** | Direkt Python metod çağrısı | Gerçek TCP/IP ağ soketi |
+| **ESC/POS ayrıştırma** | Hayır | Evet (`parse` modunda) |
+| **Hata tetikleme** | `printer.simulate_error()` | TCP üzerinden string gönder |
+| **CI uyumluluğu** | ✅ Tam uyumlu | ⚠️ Manuel başlatma gerekir |
+| **Gerçekçilik** | Orta | Yüksek (gerçek ağ soketi) |
+
+---
+
+<a id="english"></a>
+
+<details>
+<summary>🇬🇧 English — Click to expand</summary>
+
+## English
+
+### What is it?
+
+`fake_printer.py` is a TCP server that simulates a Cashino KP-300/KP-301H thermal printer. It listens on port 9100 so the API service connects to it exactly as it would to a real printer.
+
+Use it to:
+- Test the full API integration flow without hardware
+- Inspect ESC/POS commands in human-readable form (`--mode parse`)
+- Simulate all 6 printer error scenarios (`--mode simulate`)
+
+### Quick Start
+
+```bash
+cd test_fake_printer
+python3 fake_printer.py --mode parse     # Show ESC/POS commands
+./run_all_tests.sh                       # Run all automated tests
+./quick_start.sh                         # Full setup in one command
+```
+
+### Modes
+
+| Mode | Description |
+|------|-------------|
+| `simple` | Accept TCP connections, ignore data |
+| `parse` | Parse ESC/POS bytes → human-readable terminal output |
+| `simulate` | Full simulation with 6 error scenarios |
+
+### Error Simulation (`--mode simulate`)
+
+Send these strings over TCP to trigger errors:
+
+| Trigger | Error |
+|---------|-------|
+| `SIMULATE_PAPER_OUT` | Paper roll empty |
+| `SIMULATE_PAPER_JAM` | Paper jam |
+| `SIMULATE_COVER_OPEN` | Cover open |
+| `SIMULATE_OVERHEAT` | Overheating |
+| `SIMULATE_COMM_ERROR` | Communication failure |
+| `SIMULATE_CLEAR` | Clear all errors, resume normal operation |
+
+### Integration Test Flow (3 Terminals)
+
+```bash
+# Terminal 1: Start fake printer
+cd test_fake_printer && python3 fake_printer.py --mode parse
+
+# Terminal 2: Configure API for LAN connection
+cat > ../.env << EOF
+DEFAULT_CONNECTION_TYPE=lan
+LAN_HOST=127.0.0.1
+LAN_PORT=9100
+API_BEARER_TOKEN=change-me-secret-token
+EOF
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# Terminal 3: Connect and send test requests
+curl -X POST http://localhost:8000/connect \
+  -H "Authorization: Bearer change-me-secret-token" \
+  -H "Content-Type: application/json" \
+  -d '{"connection_type": "lan"}'
+
 curl -X POST http://localhost:8000/print/text \
   -H "Authorization: Bearer change-me-secret-token" \
   -H "Content-Type: application/json" \
-  -d '{"lines": [{"text": "Test"}], "cut": true}'
+  -d '{"lines": [{"text": "Hello!", "bold": true, "align": "center"}], "cut": true}'
 ```
 
-**Beklenen Çıktı (Terminal 1):**
-```
-[!] HATA SİMÜLE EDİLDİ: PAPER_OUT
-[STATUS] Kağıt: ✗ OUT | Kapak: ✓ OK | Sıcaklık: ✓ OK
+### Difference from pytest Mock Printer
 
-[+] Bağlantı: 127.0.0.1:xxxxx
-[STATUS QUERY] DLE EOT 1
-[RESPONSE] 0x20 (Error 0x20)
-```
+| | `tests/mock_printer.py` | `fake_printer.py` |
+|---|---|---|
+| **Used by** | Automated pytest suite | Manual integration testing |
+| **Protocol** | Direct Python method calls | Real TCP/IP socket |
+| **ESC/POS parsing** | No | Yes (parse mode) |
+| **Error triggering** | `printer.simulate_error()` | Send string over TCP |
+| **CI compatible** | ✅ Yes | ⚠️ Requires manual start |
 
-**Beklenen Çıktı (Terminal 2):**
-```json
-{
-  "detail": {
-    "error": {
-      "code": "PAPER_OUT",
-      "detail": "Kağıt bitti. Lütfen kağıt yükleyin ve tekrar deneyin."
-    },
-    "job_id": "..."
-  }
-}
-```
+</details>
 
-### Test 5: Status Query
+---
+
+<a id="deutsch"></a>
+
+<details>
+<summary>🇩🇪 Deutsch — Klicken zum Aufklappen</summary>
+
+## Deutsch
+
+### Was ist das?
+
+`fake_printer.py` ist ein TCP-Server, der einen Cashino KP-300/KP-301H Thermodrucker simuliert. Er lauscht auf Port 9100 für echte Netzwerktests ohne Hardware.
+
+### Schnellstart
 
 ```bash
-# Terminal 1
-python3 fake_printer.py --mode simulate
-
-# Terminal 2 (Python)
-python3 << 'EOF'
-import socket
-
-s = socket.socket()
-s.connect(('localhost', 9100))
-
-# Status query gönder
-s.send(b'\x10\x04\x01')  # DLE EOT 1
-
-# Yanıtı al
-status = s.recv(1)
-print(f"Status byte: 0x{status[0]:02X}")
-
-# Durumu decode et
-if status[0] == 0x00:
-    print("✓ Yazıcı normal durumda")
-elif status[0] & 0x20:
-    print("✗ Kağıt bitti (PAPER_OUT)")
-elif status[0] & 0x04:
-    print("✗ Kapak açık (COVER_OPEN)")
-elif status[0] & 0x40:
-    print("✗ Aşırı ısınma (OVERHEAT)")
-
-s.close()
-EOF
+cd test_fake_printer
+python3 fake_printer.py --mode parse    # ESC/POS-Befehle anzeigen
+./run_all_tests.sh                      # Automatisierte Tests ausführen
+./quick_start.sh                        # Vollständige Einrichtung
 ```
 
-### Test 6: Görsel Yazdırma
+### Modi
+
+| Modus | Beschreibung |
+|-------|--------------|
+| `simple` | TCP-Verbindungen akzeptieren, Daten ignorieren |
+| `parse` | ESC/POS-Bytes parsen → lesbarer Terminal-Output |
+| `simulate` | Vollständige Simulation mit 6 Fehlerszenarien |
+
+### Fehlersimulation (`--mode simulate`)
+
+| Trigger | Fehler |
+|---------|--------|
+| `SIMULATE_PAPER_OUT` | Papier leer |
+| `SIMULATE_PAPER_JAM` | Papierstau |
+| `SIMULATE_COVER_OPEN` | Abdeckung offen |
+| `SIMULATE_OVERHEAT` | Überhitzung |
+| `SIMULATE_COMM_ERROR` | Kommunikationsfehler |
+| `SIMULATE_CLEAR` | Alle Fehler löschen |
+
+### Integrationstest-Ablauf (3 Terminals)
 
 ```bash
-# Terminal 1
+# Terminal 1: Fake-Drucker starten
 python3 fake_printer.py --mode parse
 
-# Terminal 2: Basit bir test görseli oluştur ve yazdır
-python3 << 'EOF'
-import base64
-import requests
-from PIL import Image
-import io
+# Terminal 2: API konfigurieren und starten
+DEFAULT_CONNECTION_TYPE=lan LAN_HOST=127.0.0.1 LAN_PORT=9100 \
+  python -m uvicorn app.main:app --port 8000
 
-# 100x100 siyah-beyaz test görseli oluştur
-img = Image.new('1', (100, 100), 1)
-for i in range(0, 100, 10):
-    for j in range(100):
-        img.putpixel((i, j), 0)
-
-# Base64'e çevir
-buffer = io.BytesIO()
-img.save(buffer, format='PNG')
-img_base64 = base64.b64encode(buffer.getvalue()).decode()
-
-# API'ye gönder
-response = requests.post(
-    'http://localhost:8000/print/image',
-    headers={'Authorization': 'Bearer change-me-secret-token'},
-    json={
-        'image_base64': img_base64,
-        'align': 'center',
-        'cut': True
-    }
-)
-
-print(f"Status: {response.status_code}")
-print(response.json())
-EOF
+# Terminal 3: Testen
+curl -X POST http://localhost:8000/connect \
+  -H "Authorization: Bearer change-me-secret-token" \
+  -d '{"connection_type": "lan"}' -H "Content-Type: application/json"
 ```
 
-## 🎯 Hata Simülasyonu (Simulate Modunda)
+</details>
 
-Simulate modunda çalışırken, klavyeden aşağıdaki tuşlara basarak hata simüle edebilirsiniz:
+---
 
-| Tuş | Hata | Status Byte | Açıklama |
-|-----|------|-------------|----------|
-| **P** | PAPER_OUT | 0x20 | Kağıt bitti |
-| **C** | COVER_OPEN | 0x04 | Kapak açık |
-| **H** | OVERHEAT | 0x40 | Aşırı ısınma |
-| **J** | PAPER_JAM | 0x20 | Kağıt sıkışması |
-| **R** | RESET | 0x00 | Tüm hataları temizle |
+<a id="français"></a>
 
-## 📊 İstatistikler
+<details>
+<summary>🇫🇷 Français — Cliquer pour développer</summary>
 
-Program kapatıldığında (CTRL+C) aşağıdaki istatistikler gösterilir:
+## Français
 
-```
-📊 İstatistikler:
-  Toplam bağlantı: 5
-  Toplam byte alındı: 2,450
-  Toplam komut: 47
-  Yazdırma işlemi: 5
-  Kesme işlemi: 5
-```
+### Qu'est-ce que c'est?
 
-## 📝 Log Dosyası
+`fake_printer.py` est un serveur TCP qui simule une imprimante thermique Cashino KP-300/KP-301H sur le port 9100 pour des tests réseau réels sans matériel.
 
-Tüm işlemleri dosyaya kaydetmek için:
+### Démarrage rapide
 
 ```bash
-python3 fake_printer.py --mode parse --log printer.log
+cd test_fake_printer
+python3 fake_printer.py --mode parse    # Afficher les commandes ESC/POS
+./run_all_tests.sh                      # Tests automatisés
+./quick_start.sh                        # Configuration complète
 ```
 
-Log dosyası ANSI renk kodları olmadan, timestamp'li olarak kaydedilir:
+### Modes
 
-```
-[2026-05-27 12:00:00] [+] Bağlantı: 127.0.0.1:54321
-[2026-05-27 12:00:01] [CMD] ESC @ - Yazıcı başlatıldı
-[2026-05-27 12:00:01] [TEXT] "Test"
-[2026-05-27 12:00:01] [CUT] GS V 0 - Kağıt kes (Full)
-```
+| Mode | Description |
+|------|-------------|
+| `simple` | Accepter les connexions TCP, ignorer les données |
+| `parse` | Analyser les bytes ESC/POS → sortie lisible |
+| `simulate` | Simulation complète avec 6 scénarios d'erreur |
 
-## 🔍 Desteklenen ESC/POS Komutları
+### Simulation d'erreurs (`--mode simulate`)
 
-### Temel Komutlar
-- `ESC @` (0x1B 0x40) - Yazıcı başlatma
-- `LF` (0x0A) - Satır atlama
-- `ESC d n` - n satır besleme
+| Déclencheur | Erreur |
+|-------------|--------|
+| `SIMULATE_PAPER_OUT` | Rouleau vide |
+| `SIMULATE_PAPER_JAM` | Bourrage papier |
+| `SIMULATE_COVER_OPEN` | Couvercle ouvert |
+| `SIMULATE_OVERHEAT` | Surchauffe |
+| `SIMULATE_COMM_ERROR` | Erreur de communication |
+| `SIMULATE_CLEAR` | Effacer toutes les erreurs |
 
-### Metin Formatlama
-- `ESC E 0/1` - Kalın yazı
-- `ESC - 0/1` - Altı çizili
-- `ESC a 0/1/2` - Hizalama (sol/orta/sağ)
-- `GS ! n` - Font boyutu
-
-### Görsel ve QR
-- `GS v 0` - Raster bit image
-- `GS ( k` - QR kod komutları
-
-### Kesme
-- `GS V 0` - Tam kesme
-- `GS V 1` - Kısmi kesme
-
-### Status Query
-- `DLE EOT 1` (0x10 0x04 0x01) - Durum sorgulama
-
-## 🐛 Sorun Giderme
-
-### Port zaten kullanımda
-
-```
-✗ Hata: Port 9100 zaten kullanımda!
-Başka bir port deneyin: --port 9101
-```
-
-**Çözüm:**
-```bash
-# Başka bir port kullan
-python3 fake_printer.py --port 9101
-
-# veya kullanımdaki portu bul ve kapat
-lsof -i :9100
-kill -9 <PID>
-```
-
-### Bağlantı gelmiyor
-
-1. Firewall kontrolü:
-```bash
-# macOS
-sudo pfctl -d  # Firewall'u geçici olarak kapat
-
-# Linux
-sudo ufw allow 9100
-```
-
-2. API servisinin doğru yapılandırıldığından emin olun:
-```bash
-# .env dosyasını kontrol et
-cat ../.env | grep LAN
-```
-
-Şu değerleri görmelisiniz:
-```
-LAN_HOST=127.0.0.1
-LAN_PORT=9100
-```
-
-### Türkçe karakterler bozuk
+### Flux de test d'intégration (3 terminaux)
 
 ```bash
-# UTF-8 encoding kullan
-python3 fake_printer.py --encoding utf-8
+# Terminal 1: Démarrer la fausse imprimante
+python3 fake_printer.py --mode parse
 
-# veya latin-1
-python3 fake_printer.py --encoding latin-1
+# Terminal 2: Configurer et démarrer l'API
+DEFAULT_CONNECTION_TYPE=lan LAN_HOST=127.0.0.1 LAN_PORT=9100 \
+  python -m uvicorn app.main:app --port 8000
+
+# Terminal 3: Tester
+curl -X POST http://localhost:8000/connect \
+  -H "Authorization: Bearer change-me-secret-token" \
+  -d '{"connection_type": "lan"}' -H "Content-Type: application/json"
 ```
 
-## 📚 Ek Kaynaklar
+</details>
 
-- [Ana Proje README](../README.md)
-- [Mimari Plan](../plans/fake_printer_plan.md)
-- [ESC/POS Engine](../app/core/escpos_engine.py)
-- [LAN Printer](../app/core/lan_printer.py)
+---
 
-## 🤝 Katkıda Bulunma
-
-Bu araç [`thermal_printer_service`](../) projesinin test aracıdır. Geliştirmeler için ana projeye katkıda bulunabilirsiniz.
-
-## 📄 Lisans
-
-MIT License - Ana proje ile aynı lisans altındadır.
+← [Geri / Back to root README](../README.md)
