@@ -20,29 +20,32 @@ FastAPI (Python) ile geliştirilmiştir.
 
 ## 📸 Ekran Görüntüleri / Screenshots
 
-> **Kullanım:** Aşağıdaki görselleri `docs/screenshots/` klasörüne ilgili isimlerle ekleyin.
-
 | Dashboard Genel Bakış | Bağlantı Paneli |
 |:---:|:---:|
 | ![Dashboard](docs/screenshots/01-dashboard-overview.png) | ![Connection](docs/screenshots/02-dashboard-connection.png) |
-| `01-dashboard-overview.png` | `02-dashboard-connection.png` |
 
-| Metin Yazdırma | ACO Recycling Fişi |
+| Metin Yazdırma | Görsel Yazdırma |
 |:---:|:---:|
-| ![Print Text](docs/screenshots/03-dashboard-print-text.png) | ![ACO](docs/screenshots/05-dashboard-aco-recycling.png) |
-| `03-dashboard-print-text.png` | `05-dashboard-aco-recycling.png` |
+| ![Print Text](docs/screenshots/03-dashboard-print-text.png) | ![Print Image](docs/screenshots/04-dashboard-print-image.png) |
 
-| Log Görüntüleyici | Kağıt Rulo Takibi |
+| ACO Recycling Fişi | Log Görüntüleyici |
 |:---:|:---:|
-| ![Logs](docs/screenshots/06-dashboard-logs.png) | ![Paper](docs/screenshots/07-dashboard-paper-roll.png) |
-| `06-dashboard-logs.png` | `07-dashboard-paper-roll.png` |
+| ![ACO](docs/screenshots/05-dashboard-aco-recycling.png) | ![Logs](docs/screenshots/06-dashboard-logs.png) |
 
-| Swagger API Dokümantasyonu | Sahte Yazıcı Terminal |
+| Kağıt Rulo Takibi | Gerçek Fiş Çıktısı |
 |:---:|:---:|
-| ![Swagger](docs/screenshots/08-swagger-ui.png) | ![Fake Printer](docs/screenshots/09-fake-printer-terminal.png) |
-| `08-swagger-ui.png` | `09-fake-printer-terminal.png` |
+| ![Paper](docs/screenshots/07-dashboard-paper-roll.png) | ![Print Result](docs/screenshots/10-print-result.png) |
 
-> **Ek:** `04-dashboard-print-qr.png` (QR kod formu), `10-print-result.png` (gerçek fiş fotoğrafı — opsiyonel)
+### 📋 Swagger API Dokümantasyonu
+
+| | | |
+|:---:|:---:|:---:|
+| ![Swagger 1](docs/screenshots/08-swagger-ui.png) | ![Swagger 2](docs/screenshots/08-swagger-ui-2.png) | ![Swagger 3](docs/screenshots/08-swagger-ui-3.png) |
+| ![Swagger 4](docs/screenshots/08-swagger-ui-4.png) | ![Swagger 5](docs/screenshots/08-swagger-ui-5.png) | ![Swagger 6](docs/screenshots/08-swagger-ui-6.png) |
+
+### 🖥️ Sahte Yazıcı Terminal
+
+![Fake Printer Terminal](docs/screenshots/09-fake-printer-terminal.png)
 
 ---
 
