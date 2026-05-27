@@ -15,7 +15,7 @@ import os
 
 from app.core.config import get_settings
 from app.core.i18n_openapi import get_translated_openapi, TRANSLATIONS
-from app.core.endpoint_i18n import get_endpoint_translation
+from app.core.endpoint_i18n import get_translation_by_path
 from app.api.routes import connection, print as print_router, status, logs, health, reprint
 from app.api.routes.print import llm_router as print_llm_router
 
@@ -183,39 +183,21 @@ Varsayılan dil `.env` dosyasında `DEFAULT_LANGUAGE` ile ayarlanır.
                     if tag_name in trans["tags"]:
                         tag["description"] = trans["tags"][tag_name]
             
-            # Endpoint açıklamalarını çevir
+            # Endpoint açıklamalarını çevir (Dinamik sistem - tüm endpoint'ler için)
             if "paths" in openapi_schema:
                 for path, methods in openapi_schema["paths"].items():
                     for method, details in methods.items():
                         if method in ["get", "post", "put", "delete", "patch"]:
-                            # Logs endpoints
-                            if path == "/logs" and method == "get":
-                                t = get_endpoint_translation("logs", "get_logs", language)
-                                details["summary"] = t["summary"]
-                                details["description"] = t["description"]
-                                if "responses" in details and "200" in details["responses"]:
-                                    details["responses"]["200"]["description"] = t["response_description"]
+                            # Yeni dinamik sistem ile çeviriyi çek
+                            t = get_translation_by_path(path, method, language)
                             
-                            elif path == "/logs/export" and method == "get":
-                                t = get_endpoint_translation("logs", "export_logs", language)
-                                details["summary"] = t["summary"]
-                                details["description"] = t["description"]
-                                if "responses" in details and "200" in details["responses"]:
-                                    details["responses"]["200"]["description"] = t["response_description"]
-                            
-                            elif path == "/logs/failed" and method == "get":
-                                t = get_endpoint_translation("logs", "list_failed_jobs", language)
-                                details["summary"] = t["summary"]
-                                details["description"] = t["description"]
-                                if "responses" in details and "200" in details["responses"]:
-                                    details["responses"]["200"]["description"] = t["response_description"]
-                            
-                            # Reprint endpoint
-                            elif path == "/reprint" and method == "post":
-                                t = get_endpoint_translation("reprint", "reprint", language)
-                                details["summary"] = t["summary"]
-                                details["description"] = t["description"]
-                                if "responses" in details and "200" in details["responses"]:
+                            # Eğer bu yol için çeviri sözlükte varsa, OpenAPI şemasını güncelle
+                            if t:
+                                if "summary" in t:
+                                    details["summary"] = t["summary"]
+                                if "description" in t:
+                                    details["description"] = t["description"]
+                                if "responses" in details and "200" in details["responses"] and "response_description" in t:
                                     details["responses"]["200"]["description"] = t["response_description"]
             
         return openapi_schema

@@ -159,6 +159,62 @@
         // Dil çevirileri
         let translations = {};
         let currentLang = localStorage.getItem('api_lang') || 'tr';
+        let ui = null; // ui değişkenini global yapıyoruz
+        
+        // Swagger'ı Başlatan Fonksiyon
+        function initSwagger(lang) {
+            ui = SwaggerUIBundle({
+                url: `/openapi.json?language=${lang}`,
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "BaseLayout",
+                defaultModelsExpandDepth: -1,
+                docExpansion: "none",
+                filter: true,
+                displayRequestDuration: true,
+                persistAuthorization: true,
+                tryItOutEnabled: true,
+                syntaxHighlight: {
+                    activate: true,
+                    theme: "monokai"
+                },
+                requestInterceptor: (request) => {
+                    const token = localStorage.getItem('api_token');
+                    if (token && !request.url.includes('/health')) {
+                        request.headers['Authorization'] = `Bearer ${token}`;
+                    }
+                    if (currentLang && !request.url.includes('language=')) {
+                        const separator = request.url.includes('?') ? '&' : '?';
+                        request.url += `${separator}language=${currentLang}`;
+                    }
+                    return request;
+                },
+                onComplete: () => {
+                    const authBtn = document.querySelector('.authorize');
+                    if (authBtn) {
+                        authBtn.addEventListener('click', () => {
+                            setTimeout(() => {
+                                const tokenInput = document.querySelector('input[name="bearer"]');
+                                if (tokenInput) {
+                                    tokenInput.addEventListener('change', (e) => {
+                                        localStorage.setItem('api_token', e.target.value);
+                                    });
+                                }
+                            }, 500);
+                        });
+                    }
+                    translateSwaggerUI();
+                }
+            });
+            window.ui = ui;
+        }
         
         // Dil dosyasını yükle
         async function loadTranslations(lang) {
@@ -197,103 +253,33 @@
             document.documentElement.lang = currentLang;
         }
         
-        // Dil değiştir
+        // Dil Değiştirme Fonksiyonu
         function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('api_lang', lang);
             
-            // Buton durumlarını güncelle
-            const buttons = document.querySelectorAll('.language-selector button');
-            buttons.forEach(btn => {
+            // Buton sınıflarını ayarla
+            document.querySelectorAll('.language-selector button').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent === lang.toUpperCase()) {
                     btn.classList.add('active');
                 }
             });
             
-            // Çevirileri yükle
-            loadTranslations(lang);
-            
-            // Swagger UI'ı yeni dil ile yeniden yükle
-            if (window.ui) {
-                window.ui.specActions.updateUrl(`/openapi.json?language=${lang}`);
-                window.ui.specActions.download();
-            }
+            loadTranslations(lang); // Statik metinleri çevir
+            initSwagger(lang);      // Swagger'ı YENİDEN BAŞLAT (Sorunu çözen satır burası)
         }
         
-        // Sayfa yüklendiğinde
         window.onload = function() {
-            // İlk dil yüklemesi
             loadTranslations(currentLang);
             
-            // Aktif dil butonunu işaretle
-            const buttons = document.querySelectorAll('.language-selector button');
-            buttons.forEach(btn => {
+            document.querySelectorAll('.language-selector button').forEach(btn => {
                 if (btn.textContent === currentLang.toUpperCase()) {
                     btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
                 }
             });
             
-            // Swagger UI başlat
-            const ui = SwaggerUIBundle({
-                url: `/openapi.json?language=${currentLang}`,
-                dom_id: '#swagger-ui',
-                deepLinking: true,
-                presets: [
-                    SwaggerUIBundle.presets.apis,
-                    SwaggerUIStandalonePreset
-                ],
-                plugins: [
-                    SwaggerUIBundle.plugins.DownloadUrl
-                ],
-                layout: "BaseLayout",
-                defaultModelsExpandDepth: -1,
-                docExpansion: "none",
-                filter: true,
-                displayRequestDuration: true,
-                persistAuthorization: true,
-                tryItOutEnabled: true,
-                syntaxHighlight: {
-                    activate: true,
-                    theme: "monokai"
-                },
-                requestInterceptor: (request) => {
-                    // Bearer token otomatik ekleme
-                    const token = localStorage.getItem('api_token');
-                    if (token && !request.url.includes('/health')) {
-                        request.headers['Authorization'] = `Bearer ${token}`;
-                    }
-                    // Dil parametresi ekleme
-                    if (currentLang && !request.url.includes('language=')) {
-                        const separator = request.url.includes('?') ? '&' : '?';
-                        request.url += `${separator}language=${currentLang}`;
-                    }
-                    return request;
-                },
-                onComplete: () => {
-                    // Authorize butonuna tıklandığında token'ı kaydet
-                    const authBtn = document.querySelector('.authorize');
-                    if (authBtn) {
-                        authBtn.addEventListener('click', () => {
-                            setTimeout(() => {
-                                const tokenInput = document.querySelector('input[name="bearer"]');
-                                if (tokenInput) {
-                                    tokenInput.addEventListener('change', (e) => {
-                                        localStorage.setItem('api_token', e.target.value);
-                                    });
-                                }
-                            }, 500);
-                        });
-                    }
-                    
-                    // Swagger UI içindeki metinleri çevir
-                    translateSwaggerUI();
-                }
-            });
-
-            window.ui = ui;
+            initSwagger(currentLang); // İlk yüklemede Swagger'ı başlat
         };
         
         // Swagger UI içindeki metinleri çevir
