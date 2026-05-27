@@ -68,16 +68,16 @@ class LlmService:
         Falls back to simple key-value formatting if LLM unavailable.
         """
         if not self.enabled:
-            return self._fallback_format(data)
+            return self._fallback_format(data, language)
 
         prompt = self._build_receipt_prompt(data, language, template_hint)
         try:
             response_text = self._chat(prompt)
             lines = self._parse_llm_receipt(response_text)
-            return lines if lines else self._fallback_format(data)
+            return lines if lines else self._fallback_format(data, language)
         except Exception as exc:
             logger.warning(f"LLM receipt generation failed: {exc}. Using fallback.")
-            return self._fallback_format(data)
+            return self._fallback_format(data, language)
 
     async def translate_error(self, error_key: str, language: str = "en") -> Optional[str]:
         """
@@ -98,14 +98,18 @@ class LlmService:
     def _chat(self, prompt: str, max_tokens: int = 8192) -> str:
         """Send a single chat message to Groq with streaming and return the response text."""
         client = self._get_client()
-        
+
         # Streaming response
         completion = client.chat.completions.create(
             model=self._model,
             messages=[
                 {
                     "role": "system",
-                    "content": "Sen termal yazıcı fişleri oluşturan bir asistansın. Kısa, öz ve yapılandırılmış cevaplar verirsin.",
+                    "content": (
+                        "You are an assistant that generates thermal printer receipts. "
+                        "You produce short, well-structured JSON responses. "
+                        "Always write receipt text in the language explicitly specified by the user."
+                    ),
                 },
                 {
                     "role": "user",
@@ -133,19 +137,22 @@ class LlmService:
         language: str,
         hint: Optional[str],
     ) -> str:
-        hint_str = f" The receipt type is: {hint}." if hint else ""
+        hint_str = f" Receipt type / context: {hint}." if hint else ""
         lang_map = {"tr": "Turkish", "en": "English", "de": "German", "fr": "French"}
         lang_name = lang_map.get(language, "English")
         return (
-            f"Convert the following data into a thermal printer receipt in {lang_name}.{hint_str}\n"
-            f"Data: {json.dumps(data, ensure_ascii=False)}\n\n"
-            "Return a JSON array of line objects. Each object has:\n"
-            '  "text": string\n'
+            f"IMPORTANT: You MUST write ALL receipt text in {lang_name} ({language}). "
+            f"Do NOT use any other language.{hint_str}\n\n"
+            f"Convert the following data into a thermal printer receipt:\n"
+            f"{json.dumps(data, ensure_ascii=False)}\n\n"
+            "Return a JSON array of line objects. Each object must have:\n"
+            '  "text": string (in {lang_name})\n'
             '  "bold": boolean\n'
             '  "align": "left"|"center"|"right"\n'
             '  "font_size": "normal"|"double_height"|"double_width"|"double"\n\n'
-            "Include a header, content rows, and a footer. Return ONLY the JSON array."
-        )
+            "Include a bold centered header, content rows, and a footer separator. "
+            "Return ONLY the JSON array with no extra commentary."
+        ).replace("{lang_name}", lang_name)
 
     def _parse_llm_receipt(self, text: str) -> list[dict]:
         """Extract JSON array from LLM response."""
@@ -168,12 +175,19 @@ class LlmService:
         except (json.JSONDecodeError, KeyError):
             return []
 
-    def _fallback_format(self, data: dict) -> list[dict]:
-        """Simple key-value formatter when LLM is unavailable."""
-        lines = [{"text": "=== RECEIPT ===", "bold": True, "align": "center", "font_size": "normal"}]
+    def _fallback_format(self, data: dict, language: str = "en") -> list[dict]:
+        """Simple key-value formatter when LLM is unavailable (language-aware)."""
+        _headers = {
+            "tr": ("=== FİŞ ===", "==========="),
+            "en": ("=== RECEIPT ===", "==============="),
+            "de": ("=== BELEG ===", "============="),
+            "fr": ("=== REÇU ===", "============"),
+        }
+        header, footer = _headers.get(language, _headers["en"])
+        lines = [{"text": header, "bold": True, "align": "center", "font_size": "normal"}]
         for k, v in data.items():
             lines.append({"text": f"{k}: {v}", "bold": False, "align": "left", "font_size": "normal"})
-        lines.append({"text": "===============", "bold": False, "align": "center", "font_size": "normal"})
+        lines.append({"text": footer, "bold": False, "align": "center", "font_size": "normal"})
         return lines
 
 

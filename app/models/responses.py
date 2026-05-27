@@ -2,7 +2,7 @@
 Response models for all API endpoints.
 """
 
-from typing import Optional, Any, Literal
+from typing import Optional, Literal
 from datetime import datetime
 from pydantic import BaseModel, Field
 
@@ -161,6 +161,20 @@ class LogsResponse(BaseModel):
     }
 
 
+class PaperStatsResponse(BaseModel):
+    """Rulo kağıt kullanım tahmini"""
+    total_roll_mm: float = Field(description="Toplam rulo uzunluğu (mm)")
+    used_mm: float = Field(description="Tahmini kullanılan uzunluk (mm)")
+    remaining_mm: float = Field(description="Tahmini kalan uzunluk (mm)")
+    remaining_m: float = Field(description="Tahmini kalan uzunluk (m)")
+    remaining_pct: float = Field(description="Tahmini kalan yüzde (%)")
+    print_count: int = Field(description="Bu rulodaki toplam baskı sayısı")
+    avg_mm_per_print: float = Field(description="Baskı başına ortalama kağıt (mm)")
+    prints_remaining: int = Field(description="Tahmini kalan baskı sayısı")
+    last_reset: Optional[str] = Field(None, description="Son rulo değişim zamanı")
+    last_print: Optional[str] = Field(None, description="Son baskı zamanı")
+
+
 class HealthResponse(BaseModel):
     """Servis sağlık durumu"""
     status: Literal["ok", "degraded"] = Field(description="Servis durumu")
@@ -169,6 +183,8 @@ class HealthResponse(BaseModel):
     printer_connected: bool = Field(description="Yazıcı bağlı mı?")
     queue_size: int = Field(description="Kuyruktaki iş sayısı")
     memory_mb: float = Field(description="Bellek kullanımı (MB)")
+    paper_remaining_pct: Optional[float] = Field(None, description="Tahmini rulo kalan yüzdesi")
+    paper_prints_remaining: Optional[int] = Field(None, description="Tahmini kalan baskı sayısı")
     timestamp: datetime = Field(description="Sorgu zamanı (UTC)")
 
     model_config = {

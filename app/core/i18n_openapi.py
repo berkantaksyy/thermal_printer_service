@@ -2,8 +2,6 @@
 Multi-language OpenAPI documentation generator
 """
 from typing import Dict, Any
-import json
-import os
 
 # Dil çevirileri
 TRANSLATIONS = {

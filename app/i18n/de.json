@@ -31,6 +31,24 @@
     "error": "LLM-Anfrage fehlgeschlagen.",
     "no_api_key": "OpenRouter API-Schlüssel nicht konfiguriert."
   },
+  "paper": {
+    "remaining": "Papier verbleibend",
+    "remaining_pct": "verbleibend",
+    "remaining_m": "m übrig",
+    "prints_remaining": "Drucke verbleibend (geschätzt)",
+    "low_warning": "Papier wird knapp!",
+    "critical_warning": "Rolle sofort ersetzen!",
+    "reset_done": "Rolle zurückgesetzt. Neuer Rollenzähler gestartet.",
+    "stats_title": "Papierrollenabschätzung",
+    "total": "Gesamtrolle",
+    "used": "Verwendet",
+    "print_count": "Drucke auf dieser Rolle",
+    "avg_per_print": "Durchschn. pro Druck",
+    "last_reset": "Letzter Rollenwechsel",
+    "reset_button": "Neue Rolle eingelegt",
+    "note": "Alle Werte sind Schätzungen — der Drucker meldet keine tatsächliche Papierlänge.",
+    "section_header": "PAPIERROLLE"
+  },
   "aco": {
     "subtitle": "reverse vending recycling systems",
     "machine_id": "MaschinenID",
@@ -43,6 +61,14 @@
     "metal": "Metall",
     "tetrapak": "Tetrapak",
     "template_default": "ACO Recycling Standard-Belohnung",
-    "done": "ACO-Beleg erfolgreich gedruckt."
+    "done": "ACO-Beleg erfolgreich gedruckt.",
+    "title": "ACO Recycling Belohnungsbon",
+    "form_description": "Standard-Belohnungsbeleg für Rücknahmeautomat — MaschinenID, Belohnung, Produkttabelle und QR-Code",
+    "reward_amount": "Belohnungsbetrag",
+    "currency": "Währung",
+    "products_heading": "Produktmengen",
+    "qr_label": "QR-Code-Daten (URL)",
+    "template_label": "Vorlagenname (optional)",
+    "print_button": "ACO-Beleg drucken"
   }
 }

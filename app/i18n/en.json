@@ -31,6 +31,24 @@
     "error": "LLM request failed.",
     "no_api_key": "OpenRouter API key not configured."
   },
+  "paper": {
+    "remaining": "Paper Remaining",
+    "remaining_pct": "remaining",
+    "remaining_m": "m left",
+    "prints_remaining": "prints remaining (est.)",
+    "low_warning": "Paper running low!",
+    "critical_warning": "Replace roll immediately!",
+    "reset_done": "Roll reset. New roll counter started.",
+    "stats_title": "Paper Roll Estimate",
+    "total": "Total Roll",
+    "used": "Used",
+    "print_count": "Prints on This Roll",
+    "avg_per_print": "Avg per Print",
+    "last_reset": "Last Roll Change",
+    "reset_button": "I Loaded a New Roll",
+    "note": "All values are estimates — the printer does not report actual paper length.",
+    "section_header": "PAPER STATUS"
+  },
   "aco": {
     "subtitle": "reverse vending recycling systems",
     "machine_id": "MachineID",
@@ -43,6 +61,14 @@
     "metal": "Metal",
     "tetrapak": "Tetrapak",
     "template_default": "Aco Recycling Default Reward",
-    "done": "ACO receipt printed successfully."
+    "done": "ACO receipt printed successfully.",
+    "title": "ACO Recycling Reward Receipt",
+    "form_description": "Standard reward receipt for reverse vending machine — MachineID, reward, product table and QR code",
+    "reward_amount": "Reward Amount",
+    "currency": "Currency",
+    "products_heading": "Product Quantities",
+    "qr_label": "QR Code Data (URL)",
+    "template_label": "Template Name (optional)",
+    "print_button": "Print ACO Receipt"
   }
 }

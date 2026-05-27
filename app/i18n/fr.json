@@ -31,6 +31,24 @@
     "error": "La requête LLM a échoué.",
     "no_api_key": "Clé API OpenRouter non configurée."
   },
+  "paper": {
+    "remaining": "Papier restant",
+    "remaining_pct": "restant",
+    "remaining_m": "m restant",
+    "prints_remaining": "impressions restantes (est.)",
+    "low_warning": "Papier presque épuisé !",
+    "critical_warning": "Remplacez le rouleau immédiatement !",
+    "reset_done": "Rouleau réinitialisé. Nouveau compteur démarré.",
+    "stats_title": "Estimation du rouleau",
+    "total": "Rouleau total",
+    "used": "Utilisé",
+    "print_count": "Impressions sur ce rouleau",
+    "avg_per_print": "Moy. par impression",
+    "last_reset": "Dernier changement de rouleau",
+    "reset_button": "J'ai chargé un nouveau rouleau",
+    "note": "Toutes les valeurs sont des estimations — l'imprimante ne signale pas la longueur réelle du papier.",
+    "section_header": "ÉTAT DU ROULEAU"
+  },
   "aco": {
     "subtitle": "reverse vending recycling systems",
     "machine_id": "ID Machine",
@@ -43,6 +61,14 @@
     "metal": "Métal",
     "tetrapak": "Tetrapak",
     "template_default": "ACO Recycling Récompense Défaut",
-    "done": "Reçu ACO imprimé avec succès."
+    "done": "Reçu ACO imprimé avec succès.",
+    "title": "Reçu de récompense ACO Recycling",
+    "form_description": "Reçu de récompense standard pour distributeur automatique — ID machine, récompense, tableau produits et code QR",
+    "reward_amount": "Montant de la récompense",
+    "currency": "Devise",
+    "products_heading": "Quantités de produits",
+    "qr_label": "Données code QR (URL)",
+    "template_label": "Nom du modèle (optionnel)",
+    "print_button": "Imprimer reçu ACO"
   }
 }

@@ -8,7 +8,6 @@ Falls back to English if a key is missing in the requested language.
 
 import json
 import logging
-from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 

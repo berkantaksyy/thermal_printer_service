@@ -31,6 +31,24 @@
     "error": "LLM isteği başarısız oldu.",
     "no_api_key": "OpenRouter API anahtarı yapılandırılmamış."
   },
+  "paper": {
+    "remaining": "Kalan Kağıt",
+    "remaining_pct": "kaldı",
+    "remaining_m": "m kaldı",
+    "prints_remaining": "baskı kaldı (tahmini)",
+    "low_warning": "Kağıt bitmek üzere!",
+    "critical_warning": "Ruloyu hemen değiştirin!",
+    "reset_done": "Rulo sıfırlandı. Yeni rulo sayacı başlatıldı.",
+    "stats_title": "Kağıt Rulo Tahmini",
+    "total": "Toplam Rulo",
+    "used": "Kullanılan",
+    "print_count": "Bu Rulodaki Baskı",
+    "avg_per_print": "Baskı Başına Ort.",
+    "last_reset": "Son Rulo Değişimi",
+    "reset_button": "Yeni Rulo Taktım",
+    "note": "Tüm değerler tahmindir — yazıcı gerçek kağıt uzunluğunu raporlamaz.",
+    "section_header": "RULO DURUMU"
+  },
   "aco": {
     "subtitle": "reverse vending recycling systems",
     "machine_id": "MachineID",
@@ -43,6 +61,14 @@
     "metal": "Metal",
     "tetrapak": "Tetrapak",
     "template_default": "ACO Recycling Varsayılan Ödül",
-    "done": "ACO fişi başarıyla yazdırıldı."
+    "done": "ACO fişi başarıyla yazdırıldı.",
+    "title": "ACO Recycling Ödül Fişi",
+    "form_description": "Geri dönüşüm makinesi için standart ödül fişi — MachineID, ödül, ürün tablosu ve QR kod",
+    "reward_amount": "Ödül Miktarı",
+    "currency": "Para Birimi",
+    "products_heading": "Ürün Adetleri",
+    "qr_label": "QR Kod Verisi (URL)",
+    "template_label": "Şablon Adı (opsiyonel)",
+    "print_button": "ACO Fişi Yazdır"
   }
 }
