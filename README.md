@@ -1,6 +1,6 @@
-# Thermal Printer Service
+# Termal Yazıcı Servisi API
 
-A production-quality REST API service for **Cashino KP-300 / KP-301H** thermal printers, built with FastAPI (Python). Supports USB and LAN/Ethernet connections, full ESC/POS command execution, structured logging, job queue with reprint capability, i18n (TR/EN/DE/FR), and an optional LLM integration.
+**Cashino KP-300 / KP-301H** termal yazıcılar için profesyonel REST API servisi. FastAPI (Python) ile geliştirilmiştir. USB ve LAN bağlantı desteği, tam ESC/POS komut yürütme, yapılandırılmış loglama, kuyruk yönetimi, çoklu dil desteği (TR/EN/DE/FR) ve opsiyonel yapay zeka entegrasyonu içerir.
 
 ---
 
@@ -23,7 +23,7 @@ cp .env.example .env
 # 4. Run the service
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-# 5. Open API docs
+# 5. Open API docs (Modern Custom Design)
 open http://localhost:8000/docs
 
 # 6. Open Dashboard UI

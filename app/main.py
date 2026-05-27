@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import os
 
@@ -113,7 +113,7 @@ Varsayılan dil `.env` dosyasında `DEFAULT_LANGUAGE` ile ayarlanır.
 - **Log Formatı**: JSON Lines
 - **Donanım**: Cashino KP-300 / KP-301H (80mm, 203 DPI)
         """,
-        docs_url="/docs",
+        docs_url=None,  # Disable default docs
         redoc_url="/redoc",
         lifespan=lifespan,
         swagger_ui_parameters={
@@ -147,9 +147,27 @@ Varsayılan dil `.env` dosyasında `DEFAULT_LANGUAGE` ile ayarlanır.
     app.include_router(reprint.router)
     app.include_router(logs.router)
 
+    # ── Static Files ──────────────────────────────────────────────────────────
+    if os.path.isdir("app/static"):
+        app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    
     # ── Static UI ─────────────────────────────────────────────────────────────
     if os.path.isdir("ui"):
         app.mount("/ui", StaticFiles(directory="ui", html=True), name="ui")
+
+    # ── Custom Swagger UI ─────────────────────────────────────────────────────
+    @app.get("/docs", include_in_schema=False)
+    async def custom_swagger_ui():
+        """Custom Swagger UI with enhanced design"""
+        try:
+            with open("app/static/swagger-ui.html", "r", encoding="utf-8") as f:
+                html_content = f.read()
+            return HTMLResponse(content=html_content)
+        except FileNotFoundError:
+            return HTMLResponse(
+                content="<h1>Swagger UI bulunamadı</h1><p>Lütfen app/static/swagger-ui.html dosyasını kontrol edin.</p>",
+                status_code=404
+            )
 
     # ── Root redirect ─────────────────────────────────────────────────────────
     @app.get("/", include_in_schema=False)

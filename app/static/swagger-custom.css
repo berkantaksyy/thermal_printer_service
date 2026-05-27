@@ -1,0 +1,461 @@
+/* Swagger UI Özel Tasarım */
+
+/* Genel Tema */
+.swagger-ui {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Topbar Gizle */
+.swagger-ui .topbar {
+    display: none;
+}
+
+/* Ana Başlık */
+.swagger-ui .info {
+    margin: 30px 0;
+}
+
+.swagger-ui .info .title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+.swagger-ui .info .description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4a5568;
+}
+
+/* Endpoint Grupları (Tags) */
+.swagger-ui .opblock-tag {
+    border-bottom: 2px solid #e2e8f0;
+    padding: 15px 0;
+    margin: 20px 0;
+}
+
+.swagger-ui .opblock-tag-section {
+    margin-bottom: 30px;
+}
+
+.swagger-ui .opblock-tag {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.swagger-ui .opblock-tag:hover {
+    color: #2563eb;
+}
+
+.swagger-ui .opblock-tag svg {
+    fill: #2563eb;
+}
+
+/* Endpoint Kartları */
+.swagger-ui .opblock {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin: 15px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.swagger-ui .opblock:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* HTTP Method Renkleri */
+.swagger-ui .opblock.opblock-post {
+    border-left: 4px solid #10b981;
+    background: rgba(16, 185, 129, 0.03);
+}
+
+.swagger-ui .opblock.opblock-get {
+    border-left: 4px solid #3b82f6;
+    background: rgba(59, 130, 246, 0.03);
+}
+
+.swagger-ui .opblock.opblock-put {
+    border-left: 4px solid #f59e0b;
+    background: rgba(245, 158, 11, 0.03);
+}
+
+.swagger-ui .opblock.opblock-delete {
+    border-left: 4px solid #ef4444;
+    background: rgba(239, 68, 68, 0.03);
+}
+
+/* Endpoint Başlıkları */
+.swagger-ui .opblock-summary {
+    padding: 15px 20px;
+    align-items: center;
+}
+
+.swagger-ui .opblock-summary-method {
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    min-width: 70px;
+    text-align: center;
+}
+
+.swagger-ui .opblock-summary-path {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+}
+
+.swagger-ui .opblock-summary-description {
+    font-size: 0.95rem;
+    color: #4a5568;
+    margin-left: 15px;
+}
+
+/* Endpoint Detayları */
+.swagger-ui .opblock-body {
+    padding: 20px;
+}
+
+.swagger-ui .opblock-description-wrapper {
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.swagger-ui .opblock-description-wrapper p {
+    margin: 10px 0;
+    line-height: 1.6;
+    color: #334155;
+}
+
+/* Parametreler */
+.swagger-ui .parameters-col_description {
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.swagger-ui .parameter__name {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.swagger-ui .parameter__type {
+    color: #7c3aed;
+    font-size: 0.85rem;
+}
+
+.swagger-ui table thead tr th {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 12px;
+    background: #f1f5f9;
+}
+
+.swagger-ui table tbody tr td {
+    padding: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Response Bölümü */
+.swagger-ui .responses-wrapper {
+    margin-top: 20px;
+}
+
+.swagger-ui .responses-inner {
+    padding: 0;
+}
+
+.swagger-ui .response {
+    margin-bottom: 15px;
+}
+
+.swagger-ui .response-col_status {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.swagger-ui .response-col_description {
+    color: #4a5568;
+}
+
+/* Response Örnekleri */
+.swagger-ui .highlight-code {
+    background: #1e293b !important;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.swagger-ui .highlight-code .microlight {
+    color: #e2e8f0 !important;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Try it out Butonu */
+.swagger-ui .btn {
+    border-radius: 6px;
+    font-weight: 600;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.swagger-ui .try-out__btn {
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.swagger-ui .try-out__btn:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.swagger-ui .btn-group .btn {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.swagger-ui .btn-group .btn:hover {
+    background: #e2e8f0;
+}
+
+.swagger-ui .btn.execute {
+    background: #10b981;
+    color: white;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.swagger-ui .btn.execute:hover {
+    background: #059669;
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Input Alanları */
+.swagger-ui input[type=text],
+.swagger-ui input[type=password],
+.swagger-ui input[type=email],
+.swagger-ui textarea,
+.swagger-ui select {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.swagger-ui input[type=text]:focus,
+.swagger-ui input[type=password]:focus,
+.swagger-ui input[type=email]:focus,
+.swagger-ui textarea:focus,
+.swagger-ui select:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Authorization */
+.swagger-ui .auth-wrapper {
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.swagger-ui .auth-btn-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.swagger-ui .authorize {
+    background: #2563eb;
+    color: white;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.swagger-ui .authorize:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.swagger-ui .authorize svg {
+    fill: white;
+}
+
+/* Model Şemaları */
+.swagger-ui .model-box {
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.swagger-ui .model-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.swagger-ui .model {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.875rem;
+}
+
+/* Scrollbar */
+.swagger-ui ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.swagger-ui ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 5px;
+}
+
+.swagger-ui ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 5px;
+}
+
+.swagger-ui ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Loading */
+.swagger-ui .loading-container {
+    padding: 40px;
+    text-align: center;
+}
+
+/* Markdown İçeriği */
+.swagger-ui .markdown p {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.swagger-ui .markdown h1,
+.swagger-ui .markdown h2,
+.swagger-ui .markdown h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.swagger-ui .markdown h2 {
+    font-size: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+
+.swagger-ui .markdown h3 {
+    font-size: 1.25rem;
+}
+
+.swagger-ui .markdown code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 0.875rem;
+    color: #7c3aed;
+}
+
+.swagger-ui .markdown pre {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
+.swagger-ui .markdown pre code {
+    background: transparent;
+    color: #e2e8f0;
+    padding: 0;
+}
+
+.swagger-ui .markdown ul,
+.swagger-ui .markdown ol {
+    margin: 10px 0;
+    padding-left: 25px;
+}
+
+.swagger-ui .markdown li {
+    margin: 5px 0;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .swagger-ui .info .title {
+        font-size: 2rem;
+    }
+    
+    .swagger-ui .opblock-summary {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .swagger-ui .opblock-summary-description {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.swagger-ui .opblock {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Filter/Search */
+.swagger-ui .filter-container {
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.swagger-ui .filter input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.swagger-ui .filter input:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
