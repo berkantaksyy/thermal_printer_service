@@ -3,10 +3,10 @@ Yazıcı bağlantı endpoint'leri
 """
 
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from app.api.deps import verify_token
-from app.core.printer import PrinterFactory, get_printer, set_printer, require_printer
+from app.core.printer import PrinterFactory, get_printer, set_printer
 from app.core.error_handler import PrinterError, printer_error_to_http
 from app.models.requests import ConnectRequest
 from app.models.responses import ConnectResponse

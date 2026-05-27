@@ -270,6 +270,78 @@ PATH_TRANSLATIONS = {
             }
         }
     },
+    "/print/aco": {
+        "post": {
+            "tr": {
+                "summary": "ACO Recycling Ödül Fişi Yazdır",
+                "description": "ACO Recycling geri dönüşüm makinesi için standart ödül fişi: MachineID, tarih, ödül miktarı, ürün tablosu ve QR kod.",
+                "response_description": "ACO fişi başarıyla yazdırıldı"
+            },
+            "en": {
+                "summary": "Print ACO Recycling Reward Receipt",
+                "description": "Prints standard reward receipt for ACO Recycling reverse vending machine: MachineID, date, reward amount, product table and QR code.",
+                "response_description": "ACO receipt printed successfully"
+            },
+            "de": {
+                "summary": "ACO Recycling Belohnung Bon drucken",
+                "description": "Druckt Standard-Belohnungsbeleg für ACO Recycling Rücknahmeautomat: MaschinenID, Datum, Belohnungsbetrag, Produkttabelle und QR-Code.",
+                "response_description": "ACO-Beleg erfolgreich gedruckt"
+            },
+            "fr": {
+                "summary": "Imprimer le reçu de récompense ACO Recycling",
+                "description": "Imprime le reçu de récompense standard pour la machine de collecte ACO Recycling : ID machine, date, montant de récompense, tableau de produits et code QR.",
+                "response_description": "Reçu ACO imprimé avec succès"
+            }
+        }
+    },
+    "/paper": {
+        "get": {
+            "tr": {
+                "summary": "Rulo Durumunu Sorgula",
+                "description": "Kağıt rulo kullanım tahminini döner. Tüm değerler tahminidir.",
+                "response_description": "Rulo durum bilgileri"
+            },
+            "en": {
+                "summary": "Query Roll Status",
+                "description": "Returns paper roll usage estimate. All values are estimates.",
+                "response_description": "Roll status information"
+            },
+            "de": {
+                "summary": "Rollenstatus abfragen",
+                "description": "Gibt eine Schätzung des Papierrollenverbrauchs zurück. Alle Werte sind Schätzungen.",
+                "response_description": "Rollenstatusinformationen"
+            },
+            "fr": {
+                "summary": "Interroger l'état du rouleau",
+                "description": "Renvoie une estimation de l'utilisation du rouleau de papier. Toutes les valeurs sont des estimations.",
+                "response_description": "Informations sur l'état du rouleau"
+            }
+        }
+    },
+    "/paper/reset": {
+        "post": {
+            "tr": {
+                "summary": "Yeni Rulo Sıfırla",
+                "description": "Yeni rulo takıldığında sayacı sıfırlar.",
+                "response_description": "Rulo başarıyla sıfırlandı"
+            },
+            "en": {
+                "summary": "Reset New Roll",
+                "description": "Resets the counter when a new roll is loaded.",
+                "response_description": "Roll reset successfully"
+            },
+            "de": {
+                "summary": "Neue Rolle zurücksetzen",
+                "description": "Setzt den Zähler zurück, wenn eine neue Rolle eingelegt wird.",
+                "response_description": "Rolle erfolgreich zurückgesetzt"
+            },
+            "fr": {
+                "summary": "Réinitialiser nouveau rouleau",
+                "description": "Réinitialise le compteur lorsqu'un nouveau rouleau est chargé.",
+                "response_description": "Rouleau réinitialisé avec succès"
+            }
+        }
+    },
     "/logs/failed": {
         "get": {
             "tr": {

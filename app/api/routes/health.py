@@ -16,6 +16,7 @@ from app.core.config import get_settings
 from app.core.printer import get_printer
 from app.models.responses import HealthResponse
 from app.services.queue_service import get_queue_service
+from app.services.paper_service import get_paper_service
 
 router = APIRouter(tags=["Sağlık"])
 
@@ -120,6 +121,7 @@ async def health():
     except Exception:
         mem_mb = 0.0
 
+    paper = get_paper_service().get_stats()
     return HealthResponse(
         status="ok" if connected else "degraded",
         version=settings.app_version,
@@ -127,5 +129,7 @@ async def health():
         printer_connected=connected,
         queue_size=queue.queue_size(),
         memory_mb=round(mem_mb, 2),
+        paper_remaining_pct=paper["remaining_pct"],
+        paper_prints_remaining=paper["prints_remaining"],
         timestamp=datetime.now(timezone.utc),
     )

@@ -10,9 +10,9 @@ services:
     env_file:
       - .env
     volumes:
-      # Persist logs and failed jobs outside container
+      # Persist logs, paper state and failed jobs outside container
       - ./logs:/app/logs
-      - ./data/failed_jobs:/app/data/failed_jobs
+      - ./data:/app/data
     environment:
       - APP_HOST=0.0.0.0
       - APP_PORT=8000

@@ -14,9 +14,9 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 from app.core.config import get_settings
-from app.core.i18n_openapi import get_translated_openapi, TRANSLATIONS
+from app.core.i18n_openapi import get_translated_openapi
 from app.core.endpoint_i18n import get_translation_by_path
-from app.api.routes import connection, print as print_router, status, logs, health, reprint
+from app.api.routes import connection, print as print_router, status, logs, health, reprint, paper
 from app.api.routes.print import llm_router as print_llm_router
 
 logging.basicConfig(
@@ -148,6 +148,7 @@ Varsayılan dil `.env` dosyasında `DEFAULT_LANGUAGE` ile ayarlanır.
     app.include_router(print_llm_router)          # Option 2: LLM endpoint
     app.include_router(reprint.router)
     app.include_router(logs.router)
+    app.include_router(paper.router)
 
     # ── Static Files ──────────────────────────────────────────────────────────
     if os.path.isdir("app/static"):

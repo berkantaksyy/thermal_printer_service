@@ -10,10 +10,8 @@ References:
 """
 
 import io
-import struct
 from typing import Literal
 from PIL import Image
-import qrcode
 from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_M, ERROR_CORRECT_Q, ERROR_CORRECT_H
 
 
