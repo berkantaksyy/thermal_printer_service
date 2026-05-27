@@ -18,6 +18,18 @@ FastAPI (Python) ile geliştirilmiştir.
 
 ---
 
+> [!WARNING]
+> **Akıllı Yazdırma (AI) — `LLM_ENABLED` varsayılan olarak `false`'tur.**
+> OpenRouter API anahtarınız yoksa `.env` dosyasında `LLM_ENABLED=false` bırakın.
+> API anahtarı olmadan `true` yaparsanız `/print/smart` endpoint'i hata verir.
+> Servis, LLM olmadan **tam işlevsel** çalışır — AI sadece opsiyonel bir bonus özelliktir.
+
+> [!NOTE]
+> **MIT Lisansı:** Bu projeyi kişisel veya ticari amaçla özgürce kullanabilirsiniz.
+> Lisans dosyası eklemek için GitHub'da **Add file → Create new file → `LICENSE`** → sağdaki şablondan MIT seçin.
+
+---
+
 ## 📸 Ekran Görüntüleri / Screenshots
 
 | Dashboard Genel Bakış | Bağlantı Paneli |
@@ -45,7 +57,7 @@ FastAPI (Python) ile geliştirilmiştir.
 
 ### 🖥️ Sahte Yazıcı Terminal
 
-<img src="docs/screenshots/09-fake-printer-terminal.png" width="600"/>
+<img src="docs/screenshots/09-fake-printer-terminal.png" width="550"/>
 
 ---
 
