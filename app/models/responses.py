@@ -80,6 +80,7 @@ class StatusResponse(BaseModel):
     paper_ok: Optional[bool] = Field(None, description="Kağıt durumu (True: OK, False: Bitti)")
     cover_ok: Optional[bool] = Field(None, description="Kapak durumu (True: Kapalı, False: Açık)")
     temperature_ok: Optional[bool] = Field(None, description="Sıcaklık durumu (True: Normal, False: Aşırı ısınma)")
+    error_code: Optional[str] = Field(None, description="Aktif hata kodu (PAPER_OUT, PAPER_JAM, vb.)")
     active_job_id: Optional[str] = Field(None, description="Aktif iş kimliği")
     queue_size: int = Field(0, description="Kuyruktaki iş sayısı")
     uptime_seconds: float = Field(0.0, description="Yazıcı çalışma süresi (saniye)")

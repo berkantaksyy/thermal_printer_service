@@ -80,52 +80,9 @@
             line-height: 1.5;
         }
         
-        .language-selector {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .language-selector button {
-            padding: 6px 12px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        
-        .language-selector button:hover {
-            background: #f1f5f9;
-            border-color: #667eea;
-        }
-        
-        .language-selector button.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
     </style>
 </head>
 <body>
-    <div class="language-selector">
-        <span id="lang-label" style="font-size: 0.875rem; color: #64748b;">Dil:</span>
-        <button class="active" onclick="changeLanguage('tr')">TR</button>
-        <button onclick="changeLanguage('en')">EN</button>
-        <button onclick="changeLanguage('de')">DE</button>
-        <button onclick="changeLanguage('fr')">FR</button>
-    </div>
-    
     <div id="swagger-ui">
         <div class="custom-header">
             <h1 id="header-title">Termal Yazıcı Servisi API</h1>
@@ -246,40 +203,21 @@
             document.getElementById('card-monitoring-title').textContent = translations.infoCards.monitoring.title;
             document.getElementById('card-monitoring-desc').textContent = translations.infoCards.monitoring.description;
             
-            // Language selector label
-            document.getElementById('lang-label').textContent = translations.languageSelector.label;
-            
             // HTML lang attribute
             document.documentElement.lang = currentLang;
         }
         
-        // Dil Değiştirme Fonksiyonu
+        // Dil Değiştirme Fonksiyonu (Programatik kullanım için)
         function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('api_lang', lang);
-            
-            // Buton sınıflarını ayarla
-            document.querySelectorAll('.language-selector button').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent === lang.toUpperCase()) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            loadTranslations(lang); // Statik metinleri çevir
-            initSwagger(lang);      // Swagger'ı YENİDEN BAŞLAT (Sorunu çözen satır burası)
+            loadTranslations(lang);
+            initSwagger(lang);
         }
         
         window.onload = function() {
             loadTranslations(currentLang);
-            
-            document.querySelectorAll('.language-selector button').forEach(btn => {
-                if (btn.textContent === currentLang.toUpperCase()) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            initSwagger(currentLang); // İlk yüklemede Swagger'ı başlat
+            initSwagger(currentLang);
         };
         
         // Swagger UI içindeki metinleri çevir
