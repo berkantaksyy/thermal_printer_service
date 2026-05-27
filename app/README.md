@@ -214,7 +214,7 @@ class PrintService:
     async def print_text(job_id, lines, cut, language) -> JobRecord
     async def print_image(job_id, image_base64, align, cut, language) -> JobRecord  
     async def print_qr(job_id, data, size, error_correction, align, label, cut, language) -> JobRecord
-    async def print_smart(job_id, data, template_hint, language) -> JobRecord
+    async def print_smart(job_id, prompt, language) -> JobRecord
 ```
 
 **İş Akışı:**
@@ -307,13 +307,15 @@ Her istek `language` parametresi ile dil belirtebilir. Belirtilmezse `DEFAULT_LA
 
 ```python
 class LLMService:
-    async def generate_receipt_lines(data: dict, template_hint: str, language: str) -> list[LineItem]:
-        # 1. JSON verisi → LLM prompt
-        # 2. LLM yanıtı → satır listesi
-        # 3. LLM başarısız olursa → _fallback_format() basit anahtar-değer formatı
+    async def generate_receipt_lines(prompt: str, language: str) -> list[LineItem]:
+        # 1. Serbest metin (prompt) → LLM'e gönder
+        # 2. LLM yanıtı → başlık/içerik/footer satır listesi
+        # 3. LLM başarısız olursa → _fallback_format() metni cümlelere böler
 ```
 
-**Fallback:** LLM devre dışıysa veya hata verirse, `_fallback_format()` tüm dillerde düzgün biçimli bir fiş oluşturur.
+**Sistem Promptu:** LLM'e `double` fontlu ortalı başlık, `═` ayraç, sol hizalı içerik satırları, `─` alt ayraç ve dil bazlı footer zorunluluğu verilir. Böylece her serbest metin girişi profesyonel bir fiş düzenine dönüşür.
+
+**Fallback:** LLM devre dışıysa veya hata verirse, `_fallback_format()` metni nokta/virgül/noktalı virgülle bölerek düzgün fiş satırları üretir.
 
 ---
 

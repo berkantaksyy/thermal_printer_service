@@ -402,22 +402,17 @@
           <span data-i18n="print.smart.title">Akıllı Yazdırma (AI)</span>
         </div>
         <p class="text-secondary mb-md" style="font-size: 13px;" data-i18n="print.smart.description">
-          JSON veri gönder, yapay zeka fiş formatına dönüştürsün
+          Fişte ne olsun? Serbest yazın, AI fiş tasarımını kendisi yapsın
         </p>
-        
+
         <div class="form-group">
           <label data-i18n="print.smart.jobId">İş ID</label>
           <input type="text" id="smartJobId">
         </div>
-        
+
         <div class="form-group">
-          <label data-i18n="print.smart.hint">Fiş Tipi İpucu</label>
-          <input type="text" id="smartHint" data-i18n="print.smart.hintPlaceholder" placeholder="örn: kafe fişi">
-        </div>
-        
-        <div class="form-group">
-          <label data-i18n="print.smart.data">JSON Veri</label>
-          <textarea id="smartData" rows="6" class="font-mono"></textarea>
+          <label data-i18n="print.smart.prompt">Fişi Anlatın</label>
+          <textarea id="smartPrompt" rows="5" data-i18n="print.smart.promptPlaceholder" placeholder="örn: Kafe fişi — 2 filtre kahve 90₺, 1 su 15₺, toplam 105₺. Kasiyer: Ayşe. Teşekkürler!"></textarea>
         </div>
         
         <div class="form-row">

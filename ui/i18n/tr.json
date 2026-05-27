@@ -71,16 +71,14 @@
     },
     "smart": {
       "title": "Akıllı Yazdırma (AI)",
-      "description": "JSON veri gönder, yapay zeka fiş formatına dönüştürsün",
+      "description": "Fişte ne olsun? Serbest yazın, AI fiş tasarımını kendisi yapsın",
       "jobId": "İş ID (boş bırak = otomatik)",
-      "hint": "Fiş Tipi İpucu (opsiyonel)",
-      "hintPlaceholder": "örn: kafe fişi, market fişi",
-      "data": "JSON Veri",
-      "dataPlaceholder": "{\n  \"müşteri\": \"Ahmet\",\n  \"toplam\": \"50 TL\"\n}",
+      "prompt": "Fişi Anlatın",
+      "promptPlaceholder": "örn: Kafe fişi — 2 filtre kahve 90₺, 1 su 15₺, toplam 105₺. Kasiyer: Ayşe. Teşekkürler!",
+      "emptyPrompt": "Lütfen fişi anlatın",
       "language": "Dil",
       "autoCut": "Otomatik Kes",
-      "button": "Akıllı Yazdır",
-      "invalidJson": "Geçersiz JSON formatı"
+      "button": "Akıllı Yazdır"
     }
   },
   "logs": {

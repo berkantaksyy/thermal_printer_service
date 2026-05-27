@@ -69,16 +69,14 @@
     },
     "smart": {
       "title": "Impression intelligente (IA)",
-      "description": "Envoyez des données JSON, l'IA les formate en reçu",
+      "description": "Décrivez votre reçu en texte libre — l'IA conçoit la mise en page",
       "jobId": "ID tâche (laisser vide = auto)",
-      "hint": "Type de reçu (optionnel)",
-      "hintPlaceholder": "ex: reçu café, reçu magasin",
-      "data": "Données JSON",
-      "dataPlaceholder": "{\n  \"client\": \"Pierre\",\n  \"total\": \"50€\"\n}",
+      "prompt": "Décrire le reçu",
+      "promptPlaceholder": "ex: Reçu café — 2 cafés filtre 9€, 1 eau 2€, total 11€. Caissière: Sophie. Merci!",
+      "emptyPrompt": "Veuillez décrire le reçu",
       "language": "Langue",
       "autoCut": "Coupe auto",
-      "button": "Impression intelligente",
-      "invalidJson": "Format JSON invalide"
+      "button": "Impression intelligente"
     }
   },
   "logs": {

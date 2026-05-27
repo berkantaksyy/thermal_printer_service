@@ -69,16 +69,14 @@
     },
     "smart": {
       "title": "Intelligenter Druck (KI)",
-      "description": "JSON-Daten senden, KI formatiert als Beleg",
+      "description": "Beschreiben Sie den Beleg in Freitext — die KI gestaltet das Layout",
       "jobId": "Auftrags-ID (leer lassen = auto)",
-      "hint": "Belegtyp-Hinweis (optional)",
-      "hintPlaceholder": "z.B: Café-Beleg, Geschäftsbeleg",
-      "data": "JSON-Daten",
-      "dataPlaceholder": "{\n  \"kunde\": \"Hans\",\n  \"gesamt\": \"50€\"\n}",
+      "prompt": "Beleg beschreiben",
+      "promptPlaceholder": "z.B: Café-Beleg — 2 Filterkaffee 9€, 1 Wasser 2€, Gesamt 11€. Kassierer: Hans. Danke!",
+      "emptyPrompt": "Bitte beschreiben Sie den Beleg",
       "language": "Sprache",
       "autoCut": "Autom. Schnitt",
-      "button": "Intelligent drucken",
-      "invalidJson": "Ungültiges JSON-Format"
+      "button": "Intelligent drucken"
     }
   },
   "logs": {

@@ -108,24 +108,24 @@ class PrintQRRequest(BaseModel):
 
 
 class SmartPrintRequest(BaseModel):
-    """Yapay zeka destekli akıllı yazdırma isteği"""
-    job_id: Optional[str] = Field(None, description="İş kimliği")
-    data: dict[str, Any] = Field(description="Fiş formatına dönüştürülecek yapılandırılmış veri")
-    template_hint: Optional[str] = Field(None, description="Fiş tipi ipucu (örn: 'kafe fişi', 'geri dönüşüm makbuzu')")
+    """Yapay zeka destekli akıllı yazdırma isteği — serbest metin gir, AI fiş oluştursun"""
+    job_id: Optional[str] = Field(None, description="İş kimliği (idempotency için)")
+    prompt: str = Field(
+        description="Fişte ne olmasını istediğini serbest metinle anlat",
+        min_length=3,
+        max_length=2000,
+    )
     language: Optional[str] = Field(None, description="Çıktı dili (tr/en/de/fr)")
     cut: bool = Field(True, description="Otomatik kağıt kesme")
 
     model_config = {"json_schema_extra": {
         "examples": [{
             "job_id": "smart-001",
-            "data": {
-                "machine_id": "ACO-TEST-0001",
-                "reward": "3.00 TL",
-                "plastic": 2,
-                "metal": 1,
-                "glass": 0
-            },
-            "template_hint": "geri dönüşüm ödül fişi",
+            "prompt": "Kafe fişi: 2 adet filtre kahve 90 TL, 1 adet su 15 TL, toplam 105 TL. Kasiyer: Ayşe. Teşekkürler!",
+            "language": "tr",
+            "cut": True
+        }, {
+            "prompt": "ACO geri dönüşüm: makine ACO-IST-001, 3 plastik 2 cam 1 metal toplandı, ödül 7.50 TL",
             "language": "tr",
             "cut": True
         }]

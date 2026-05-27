@@ -605,44 +605,30 @@ class PrinterApp {
   // ═══════════════════════════════════════════════════════════════════════════
 
   /**
-   * Akıllı yazdırma (AI)
+   * Akıllı yazdırma (AI) — serbest metin → LLM → fiş
    */
   async handlePrintSmart() {
     const btn = document.getElementById('printSmartBtn');
-    const jobId = document.getElementById('smartJobId')?.value || undefined;
-    const hint = document.getElementById('smartHint')?.value || undefined;
-    const jsonData = document.getElementById('smartData')?.value;
+    const jobId = document.getElementById('smartJobId')?.value.trim() || undefined;
+    const prompt = document.getElementById('smartPrompt')?.value.trim();
     const language = document.getElementById('smartLang')?.value || i18n.getCurrentLanguage();
     const autoCut = document.getElementById('smartAutoCut')?.checked !== false;
 
-    if (!jsonData || jsonData.trim() === '') {
-      ui.warning('Lütfen JSON veri girin');
-      return;
-    }
-
-    // JSON validasyonu
-    if (!ui.isValidJSON(jsonData)) {
-      ui.error('Geçersiz JSON formatı');
+    if (!prompt) {
+      ui.warning(i18n.t('print.smart.emptyPrompt') || 'Lütfen fişi anlatın');
       return;
     }
 
     try {
       ui.setButtonLoading(btn, true);
 
-      const data = {
-        data: JSON.parse(jsonData),
-        cut: autoCut,
-        language
-      };
-
+      const data = { prompt, cut: autoCut, language };
       if (jobId) data.job_id = jobId;
-      if (hint) data.template_hint = hint;
 
       const result = await api.printSmart(data);
       ui.success(`🤖 ${result.message} (${result.job_id})`);
 
-      // Önizlemeyi göster
-      this.showReceiptPreview('smart', { data: JSON.parse(jsonData), hint, jobId: result.job_id });
+      this.showReceiptPreview('smart', { prompt, jobId: result.job_id });
 
       setTimeout(() => { this.loadLogs(); this.loadPaperStats(); }, 1000);
 
@@ -860,25 +846,24 @@ class PrinterApp {
       if (meta) meta.textContent = `İş ID: ${jobId || '—'}  |  Hizalama: ${align}`;
 
     } else if (type === 'smart') {
-      const { data: jsonData = {}, hint, jobId } = data;
+      const { prompt = '', jobId } = data;
 
       const header = document.createElement('div');
       header.className = 'receipt-line align-center bold font-double';
-      header.textContent = hint ? hint.toUpperCase() : 'AKILLI FİŞ';
+      header.textContent = '🤖 AI FİŞ';
       body.appendChild(header);
 
       const hr1 = document.createElement('hr');
       hr1.className = 'receipt-divider';
       body.appendChild(hr1);
 
-      Object.entries(jsonData).forEach(([key, val]) => {
+      // Prompt metnini satır satır göster
+      prompt.split(/[.,;،\n]+/).forEach(part => {
+        part = part.trim();
+        if (!part) return;
         const row = document.createElement('span');
         row.className = 'receipt-line align-left';
-        const keyStr = key.replace(/_/g, ' ').toUpperCase();
-        const valStr = String(val);
-        // Pad key and value like a receipt
-        const padded = keyStr.padEnd(14, ' ') + valStr;
-        row.textContent = padded;
+        row.textContent = part;
         body.appendChild(row);
         body.appendChild(document.createElement('br'));
       });
@@ -1012,8 +997,8 @@ class PrinterApp {
       const tr = document.createElement('tr');
       tr.style.cssText = idx % 2 === 0 ? 'background:#fff;' : 'background:#f8fdf8;';
       tr.innerHTML = `
-        <td style="text-align:left; padding:4px 3px;">${icon} ${name}</td>
-        <td style="text-align:center; color:#000;">${qty}</td>
+        <td style="text-align:left; padding:4px 3px; color:#111; font-weight:700;">${icon} ${name}</td>
+        <td style="text-align:center; color:#111; font-weight:700;">${qty}</td>
         <td style="text-align:right; padding:4px 3px; font-weight:700; color:#27ae60;">${pts}</td>
       `;
       tbody.appendChild(tr);

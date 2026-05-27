@@ -16,7 +16,8 @@ IMPORTANT NOTE (per task requirement):
 
 import json
 import logging
-from typing import Any, Optional
+import re
+from typing import Optional
 
 from openai import OpenAI
 
@@ -58,26 +59,25 @@ class LlmService:
 
     async def generate_receipt_lines(
         self,
-        data: dict[str, Any],
+        prompt: str,
         language: str = "en",
-        template_hint: Optional[str] = None,
     ) -> list[dict]:
         """
-        Ask LLM to convert structured data into receipt line dicts.
+        Ask LLM to convert a free-text description into receipt line dicts.
         Returns list of {text, bold, align, font_size} dicts.
-        Falls back to simple key-value formatting if LLM unavailable.
+        Falls back to simple text formatting if LLM unavailable.
         """
         if not self.enabled:
-            return self._fallback_format(data, language)
+            return self._fallback_format(prompt, language)
 
-        prompt = self._build_receipt_prompt(data, language, template_hint)
+        receipt_prompt = self._build_receipt_prompt(prompt, language)
         try:
-            response_text = self._chat(prompt)
+            response_text = self._chat(receipt_prompt)
             lines = self._parse_llm_receipt(response_text)
-            return lines if lines else self._fallback_format(data, language)
+            return lines if lines else self._fallback_format(prompt, language)
         except Exception as exc:
             logger.warning(f"LLM receipt generation failed: {exc}. Using fallback.")
-            return self._fallback_format(data, language)
+            return self._fallback_format(prompt, language)
 
     async def translate_error(self, error_key: str, language: str = "en") -> Optional[str]:
         """
@@ -96,63 +96,64 @@ class LlmService:
             return None
 
     def _chat(self, prompt: str, max_tokens: int = 8192) -> str:
-        """Send a single chat message to Groq with streaming and return the response text."""
+        """Send a chat message to the LLM with streaming and return the response text."""
         client = self._get_client()
 
-        # Streaming response
         completion = client.chat.completions.create(
             model=self._model,
             messages=[
                 {
                     "role": "system",
-                    "content": (
-                        "Include a bold centered header, content rows, and a footer separator. "
-                        "Return ONLY the JSON array. DO NOT wrap it in markdown blockquotes like ```json. "
-                        "DO NOT add any conversational text before or after the JSON."
-                    ),
+                    "content": self._system_prompt(),
                 },
                 {
                     "role": "user",
                     "content": prompt,
                 },
             ],
-            temperature=0.1,
+            temperature=0.2,
             max_completion_tokens=max_tokens,
             top_p=1,
             stream=True,
             stop=None,
         )
-        
-        # Collect streamed response
+
         full_response = ""
         for chunk in completion:
             if chunk.choices[0].delta.content:
                 full_response += chunk.choices[0].delta.content
-        
+
         return full_response.strip()
 
-    def _build_receipt_prompt(
-        self,
-        data: dict,
-        language: str,
-        hint: Optional[str],
-    ) -> str:
-        hint_str = f" Receipt type / context: {hint}." if hint else ""
+    def _system_prompt(self) -> str:
+        return (
+            "You are a professional thermal receipt printer formatter.\n"
+            "Your ONLY job: convert any free-text description into a beautifully formatted thermal receipt.\n\n"
+            "Output ONLY a raw JSON array — no markdown fences (```), no explanation, no extra text.\n"
+            "Each element must have exactly these fields:\n"
+            '  "text"      : string — the line content\n'
+            '  "bold"      : boolean\n'
+            '  "align"     : "left" | "center" | "right"\n'
+            '  "font_size" : "normal" | "double"\n\n'
+            "Receipt design rules (follow strictly):\n"
+            "  1. First line: bold centered title, font_size 'double'\n"
+            "  2. Second line: separator — a row of '═' chars (32 wide), align center\n"
+            "  3. Content rows: left-aligned, normal size. Use 'KEY          VALUE' padding style.\n"
+            "  4. Important amounts/totals: bold, centered\n"
+            "  5. Before footer: separator row of '─' chars (32 wide)\n"
+            "  6. Last 1-2 lines: short centered thank-you or footer, normal size\n"
+            "  7. ALL text must be in the language specified by the user\n"
+            "  8. Return ONLY the JSON array, starting with '[' and ending with ']'"
+        )
+
+    def _build_receipt_prompt(self, user_prompt: str, language: str) -> str:
         lang_map = {"tr": "Turkish", "en": "English", "de": "German", "fr": "French"}
         lang_name = lang_map.get(language, "English")
         return (
-            f"IMPORTANT: You MUST write ALL receipt text in {lang_name} ({language}). "
-            f"Do NOT use any other language.{hint_str}\n\n"
-            f"Convert the following data into a thermal printer receipt:\n"
-            f"{json.dumps(data, ensure_ascii=False)}\n\n"
-            "Return a JSON array of line objects. Each object must have:\n"
-            '  "text": string (in {lang_name})\n'
-            '  "bold": boolean\n'
-            '  "align": "left"|"center"|"right"\n'
-            '  "font_size": "normal"|"double_height"|"double_width"|"double"\n\n'
-            "Include a bold centered header, content rows, and a footer separator. "
-            "Return ONLY the JSON array with no extra commentary."
-        ).replace("{lang_name}", lang_name)
+            f"Language: {lang_name} ({language}). Write ALL text in {lang_name} ONLY.\n\n"
+            f"Create a thermal printer receipt for the following:\n\n"
+            f"{user_prompt}"
+        )
 
     def _parse_llm_receipt(self, text: str) -> list[dict]:
         """Extract JSON array from LLM response."""
@@ -175,19 +176,37 @@ class LlmService:
         except (json.JSONDecodeError, KeyError):
             return []
 
-    def _fallback_format(self, data: dict, language: str = "en") -> list[dict]:
-        """Simple key-value formatter when LLM is unavailable (language-aware)."""
-        _headers = {
-            "tr": ("=== FİŞ ===", "==========="),
-            "en": ("=== RECEIPT ===", "==============="),
-            "de": ("=== BELEG ===", "============="),
-            "fr": ("=== REÇU ===", "============"),
+    def _fallback_format(self, prompt: str, language: str = "en") -> list[dict]:
+        """
+        Simple fallback formatter when LLM is unavailable.
+        Turns the free-text prompt into a readable receipt layout.
+        """
+        _titles = {"tr": "FİŞ", "en": "RECEIPT", "de": "BELEG", "fr": "REÇU"}
+        _footers = {
+            "tr": "Teşekkür ederiz!",
+            "en": "Thank you!",
+            "de": "Vielen Dank!",
+            "fr": "Merci!",
         }
-        header, footer = _headers.get(language, _headers["en"])
-        lines = [{"text": header, "bold": True, "align": "center", "font_size": "normal"}]
-        for k, v in data.items():
-            lines.append({"text": f"{k}: {v}", "bold": False, "align": "left", "font_size": "normal"})
-        lines.append({"text": footer, "bold": False, "align": "center", "font_size": "normal"})
+        title = _titles.get(language, "RECEIPT")
+        footer = _footers.get(language, "Thank you!")
+        sep = "═" * 32
+        sep2 = "─" * 32
+
+        lines = [
+            {"text": title, "bold": True, "align": "center", "font_size": "double"},
+            {"text": sep, "bold": False, "align": "center", "font_size": "normal"},
+        ]
+
+        # Split prompt into sentences / clauses and render each as a row
+        parts = re.split(r"[.,;،\n]+", prompt)
+        for part in parts:
+            part = part.strip()
+            if part:
+                lines.append({"text": part, "bold": False, "align": "left", "font_size": "normal"})
+
+        lines.append({"text": sep2, "bold": False, "align": "center", "font_size": "normal"})
+        lines.append({"text": footer, "bold": True, "align": "center", "font_size": "normal"})
         return lines
 
 

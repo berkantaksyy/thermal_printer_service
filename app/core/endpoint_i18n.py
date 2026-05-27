@@ -178,22 +178,59 @@ PATH_TRANSLATIONS = {
         "post": {
             "tr": {
                 "summary": "Akıllı Yazdırma (Yapay Zeka)",
-                "description": "Yapay zeka destekli otomatik fiş formatı ile yazdırma yapar.",
+                "description": (
+                    "Serbest metin girin, yapay zeka fiş tasarımını kendisi yapsın.\n\n"
+                    "**`prompt`** alanına ne yazdırmak istediğinizi Türkçe olarak anlatın — "
+                    "ürünler, fiyatlar, makine ID, tarih, kasiyer adı gibi. "
+                    "AI başlığı, hizalamayı, ayraçları ve footer'ı otomatik belirler.\n\n"
+                    "**Örnek:**\n```\n"
+                    "Kafe fişi — 2 filtre kahve 90₺, 1 su 15₺, toplam 105₺. Kasiyer: Ayşe.\n"
+                    "```\n\n"
+                    "> ⚠️ Bu özellik `LLM_ENABLED=true` ve geçerli bir API anahtarı gerektirir. "
+                    "Devre dışıysa metin serbest format olarak yazdırılır."
+                ),
                 "response_description": "Akıllı yazdırma işi kuyruğa alındı"
             },
             "en": {
                 "summary": "Smart Printing (AI)",
-                "description": "Prints with AI-powered automatic receipt format.",
+                "description": (
+                    "Write a plain-text description — AI designs the receipt layout automatically.\n\n"
+                    "Describe what you want in the **`prompt`** field: products, prices, machine ID, "
+                    "cashier name, date, totals. The AI decides the title, alignment, separators and footer.\n\n"
+                    "**Example:**\n```\n"
+                    "Cafe receipt — 2 filter coffee £4.50, 1 water £1.20, total £5.70. Cashier: Emma.\n"
+                    "```\n\n"
+                    "> ⚠️ Requires `LLM_ENABLED=true` and a valid API key. "
+                    "If disabled, the text is formatted as a plain receipt."
+                ),
                 "response_description": "Smart print job queued"
             },
             "de": {
                 "summary": "Intelligenter Druck (KI)",
-                "description": "Druckt mit KI-gestütztem automatischem Belegformat.",
+                "description": (
+                    "Freitext eingeben — die KI gestaltet das Beleglayout automatisch.\n\n"
+                    "Beschreiben Sie im Feld **`prompt`** was gedruckt werden soll: Produkte, "
+                    "Preise, Maschinen-ID, Kassierer, Datum. Die KI bestimmt Titel, Ausrichtung, "
+                    "Trennzeichen und Fußzeile.\n\n"
+                    "**Beispiel:**\n```\n"
+                    "Café-Beleg — 2 Filterkaffee 9€, 1 Wasser 2€, Gesamt 11€. Kassierer: Hans.\n"
+                    "```\n\n"
+                    "> ⚠️ Erfordert `LLM_ENABLED=true` und einen gültigen API-Schlüssel."
+                ),
                 "response_description": "Intelligenter Druckauftrag in Warteschlange"
             },
             "fr": {
                 "summary": "Impression intelligente (IA)",
-                "description": "Imprime avec un format de reçu automatique alimenté par l'IA.",
+                "description": (
+                    "Saisissez un texte libre — l'IA conçoit automatiquement la mise en page du reçu.\n\n"
+                    "Décrivez dans le champ **`prompt`** ce que vous souhaitez imprimer : produits, "
+                    "prix, ID machine, caissier, date. L'IA détermine le titre, l'alignement, "
+                    "les séparateurs et le pied de page.\n\n"
+                    "**Exemple:**\n```\n"
+                    "Reçu café — 2 cafés filtre 9€, 1 eau 2€, total 11€. Caissière: Sophie.\n"
+                    "```\n\n"
+                    "> ⚠️ Nécessite `LLM_ENABLED=true` et une clé API valide."
+                ),
                 "response_description": "Tâche d'impression intelligente mise en file d'attente"
             }
         }

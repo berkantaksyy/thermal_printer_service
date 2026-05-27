@@ -24,10 +24,6 @@ FastAPI (Python) ile geliştirilmiştir.
 > API anahtarı olmadan `true` yaparsanız `/print/smart` endpoint'i hata verir.
 > Servis, LLM olmadan **tam işlevsel** çalışır — AI sadece opsiyonel bir bonus özelliktir.
 
-> [!NOTE]
-> **MIT Lisansı:** Bu projeyi kişisel veya ticari amaçla özgürce kullanabilirsiniz.
-> Lisans dosyası eklemek için GitHub'da **Add file → Create new file → `LICENSE`** → sağdaki şablondan MIT seçin.
-
 ---
 
 ## 📸 Ekran Görüntüleri / Screenshots
@@ -85,7 +81,7 @@ FastAPI (Python) ile geliştirilmiştir.
 - **Çoklu Dil (i18n)** — TR / EN / DE / FR (API yanıtları ve Web UI)
 - **Loglama** — JSON Lines format, CSV dışa aktarma, sayfalama
 - **Başarısız İş Kuyruğu** — Disk kalıcılığı, yeniden baskı endpoint'i
-- **Akıllı Yazdırma (LLM)** — OpenRouter ile yapay zeka destekli fiş oluşturma (opsiyonel)
+- **Akıllı Yazdırma (LLM)** — Serbest metin gir, AI fiş tasarımını kendisi yapsın (opsiyonel)
 - **56 Test** — Birim, entegrasyon, hata simülasyonu (fiziksel yazıcı gerektirmez)
 - **Docker Ready** — `docker compose up --build` ile tek komut kurulum
 - **Swagger UI** — `/docs` adresinde interaktif API dokümantasyonu
@@ -209,14 +205,9 @@ POST /print/text
 ```json
 POST /print/smart
 {
-  "data": {
-    "machine_id": "ACO-TEST-0001",
-    "reward": "3.00 TL",
-    "plastic": 2,
-    "metal": 1
-  },
-  "template_hint": "geri dönüşüm ödül fişi",
-  "language": "tr"
+  "prompt": "ACO geri dönüşüm: makine ACO-TEST-0001, 2 plastik 1 metal toplandı, ödül 3.00 TL. Teşekkürler!",
+  "language": "tr",
+  "cut": true
 }
 ```
 
@@ -335,7 +326,7 @@ Detaylı test dokümantasyonu: [tests/README.md](tests/README.md)
 - **Multi-language (i18n)** — TR / EN / DE / FR (API responses and Web UI)
 - **Logging** — JSON Lines format, CSV export, pagination
 - **Failed Job Queue** — Disk persistence, reprint endpoint
-- **Smart Print (LLM)** — AI-assisted receipt generation via OpenRouter (optional)
+- **Smart Print (LLM)** — Write plain text, AI designs the full receipt layout (optional)
 - **56 Tests** — Unit, integration, error simulation (no physical printer required)
 - **Docker Ready** — Single-command setup with `docker compose up --build`
 - **Swagger UI** — Interactive API documentation at `/docs`
@@ -420,7 +411,7 @@ See [tests/README.md](tests/README.md) for full test documentation.
 - **Mehrsprachig (i18n)** — TR / EN / DE / FR (API-Antworten und Web-UI)
 - **Protokollierung** — JSON-Lines-Format, CSV-Export, Paginierung
 - **Fehlgeschlagene Jobs** — Festplattenpersistenz, Nachdrucken-Endpunkt
-- **Intelligenter Druck (LLM)** — KI-gestützte Bonbelegstellung via OpenRouter (optional)
+- **Intelligenter Druck (LLM)** — Freitext eingeben, KI gestaltet das Beleglayout automatisch (optional)
 - **56 Tests** — Unit-, Integrations- und Fehlersimulation (kein physischer Drucker erforderlich)
 - **Docker Ready** — Einzel-Befehl-Setup mit `docker compose up --build`
 
@@ -488,7 +479,7 @@ pytest --cov=app --cov-report=html
 - **Multi-langues (i18n)** — TR / EN / DE / FR (réponses API et interface Web)
 - **Journalisation** — Format JSON Lines, export CSV, pagination
 - **File d'attente des échecs** — Persistance sur disque, endpoint de réimpression
-- **Impression intelligente (LLM)** — Génération de reçus assistée par IA via OpenRouter (optionnel)
+- **Impression intelligente (LLM)** — Texte libre en entrée, l'IA conçoit le reçu automatiquement (optionnel)
 - **56 Tests** — Unitaires, intégration, simulation d'erreurs (sans imprimante physique)
 - **Docker Ready** — Configuration en une commande avec `docker compose up --build`
 

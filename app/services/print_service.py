@@ -146,7 +146,7 @@ class PrintService:
 
         rec = await queue.enqueue(
             op="print_smart",
-            payload={"data": req.data, "language": lang, "cut": req.cut},
+            payload={"prompt": req.prompt, "language": lang, "cut": req.cut},
             job_id=req.job_id,
         )
         if rec.is_duplicate:
@@ -154,7 +154,7 @@ class PrintService:
                                message="Duplicate job — already processed.",
                                timestamp=datetime.now(timezone.utc))
 
-        lines = await llm.generate_receipt_lines(req.data, language=lang, template_hint=req.template_hint)
+        lines = await llm.generate_receipt_lines(req.prompt, language=lang)
         return await self._execute(
             rec=rec,
             printer=printer,
@@ -310,7 +310,7 @@ class PrintService:
         elif op == "print_smart":
             lang = payload.get("language", "en")
             llm = get_llm_service()
-            lines = llm._fallback_format(payload.get("data", {}), language=lang)
+            lines = llm._fallback_format(payload.get("prompt", ""), language=lang)
             return escpos.build_receipt(lines, cut=payload.get("cut", True))
         else:
             return b""

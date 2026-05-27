@@ -69,16 +69,14 @@
     },
     "smart": {
       "title": "Smart Print (AI)",
-      "description": "Send JSON data, AI formats it as a receipt",
+      "description": "Describe your receipt in plain text — AI designs the layout",
       "jobId": "Job ID (leave blank = auto)",
-      "hint": "Receipt Type Hint (optional)",
-      "hintPlaceholder": "e.g: cafe receipt, store receipt",
-      "data": "JSON Data",
-      "dataPlaceholder": "{\n  \"customer\": \"John\",\n  \"total\": \"$50\"\n}",
+      "prompt": "Describe the Receipt",
+      "promptPlaceholder": "e.g: Cafe receipt — 2 filter coffee £4.50, 1 water £1.20, total £5.70. Cashier: Emma. Thank you!",
+      "emptyPrompt": "Please describe the receipt",
       "language": "Language",
       "autoCut": "Auto-cut",
-      "button": "Smart Print",
-      "invalidJson": "Invalid JSON format"
+      "button": "Smart Print"
     }
   },
   "logs": {
