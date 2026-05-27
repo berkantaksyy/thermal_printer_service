@@ -106,9 +106,9 @@ class LlmService:
                 {
                     "role": "system",
                     "content": (
-                        "You are an assistant that generates thermal printer receipts. "
-                        "You produce short, well-structured JSON responses. "
-                        "Always write receipt text in the language explicitly specified by the user."
+                        "Include a bold centered header, content rows, and a footer separator. "
+                        "Return ONLY the JSON array. DO NOT wrap it in markdown blockquotes like ```json. "
+                        "DO NOT add any conversational text before or after the JSON."
                     ),
                 },
                 {
@@ -116,7 +116,7 @@ class LlmService:
                     "content": prompt,
                 },
             ],
-            temperature=1,
+            temperature=0.1,
             max_completion_tokens=max_tokens,
             top_p=1,
             stream=True,

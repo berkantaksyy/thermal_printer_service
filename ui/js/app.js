@@ -1066,7 +1066,7 @@ class PrinterApp {
    */
   async loadLogs(statusFilter = null) {
     try {
-      const params = { page: 1, page_size: 100 };
+      const params = { page: 1, page_size: 1000 };
       if (statusFilter) params.status = statusFilter;
       const result = await api.getLogs(params);
       this.renderLogs(result.entries || [], result.total || 0);
