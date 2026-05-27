@@ -202,7 +202,7 @@ class EscPosEngine:
         # Set error correction
         buf += GS + b"(k\x03\x001E" + bytes([ec_val])
         # Store data
-        buf += GS + b"(k" + bytes([pL, pH]) + b"\x01P" + data_bytes
+        buf += GS + b"(k" + bytes([pL, pH]) + b"\x31P" + data_bytes
         # Print
         buf += GS + b"(k\x03\x001Q0"
 

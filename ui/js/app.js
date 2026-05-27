@@ -28,6 +28,9 @@ class PrinterApp {
     // Logları yükle
     await this.loadLogs();
 
+    // Log otomatik yenileme başlat (30 saniye)
+    this.startLogAutoRefresh();
+
     console.log('✅ Printer App initialized');
   }
 
@@ -104,13 +107,24 @@ class PrinterApp {
     // Log butonları
     const refreshLogsBtn = document.getElementById('refreshLogsBtn');
     const exportLogsBtn = document.getElementById('exportLogsBtn');
-    
+    const logFilterSelect = document.getElementById('logFilterSelect');
+
     if (refreshLogsBtn) {
-      refreshLogsBtn.addEventListener('click', () => this.loadLogs());
+      refreshLogsBtn.addEventListener('click', () => {
+        const filter = logFilterSelect?.value;
+        this.loadLogs(filter === 'all' ? null : filter);
+      });
     }
-    
+
     if (exportLogsBtn) {
       exportLogsBtn.addEventListener('click', () => this.exportLogs());
+    }
+
+    if (logFilterSelect) {
+      logFilterSelect.addEventListener('change', () => {
+        const filter = logFilterSelect.value;
+        this.loadLogs(filter === 'all' ? null : filter);
+      });
     }
 
     // Durum yenileme butonu
@@ -506,10 +520,12 @@ class PrinterApp {
   /**
    * Logları yükle
    */
-  async loadLogs() {
+  async loadLogs(statusFilter = null) {
     try {
-      const result = await api.getLogs({ page: 1, page_size: 50 });
-      this.renderLogs(result.entries || []);
+      const params = { page: 1, page_size: 100 };
+      if (statusFilter) params.status = statusFilter;
+      const result = await api.getLogs(params);
+      this.renderLogs(result.entries || [], result.total || 0);
     } catch (error) {
       console.error('Failed to load logs:', error);
     }
@@ -518,9 +534,13 @@ class PrinterApp {
   /**
    * Logları render et
    */
-  renderLogs(entries) {
+  renderLogs(entries, total) {
     const tbody = document.getElementById('logsTableBody');
     if (!tbody) return;
+
+    // Toplam sayacı güncelle
+    const totalEl = document.getElementById('logsTotalCount');
+    if (totalEl) totalEl.textContent = `(${total} kayıt)`;
 
     if (entries.length === 0) {
       tbody.innerHTML = `
@@ -537,22 +557,32 @@ class PrinterApp {
     const sortedEntries = [...entries].reverse();
 
     tbody.innerHTML = sortedEntries.map(entry => {
+      const isFailed = entry.status === 'failed';
       const statusClass = entry.status === 'done' ? 'success' :
-                         entry.status === 'failed' ? 'error' : 'secondary';
-      
+                         isFailed ? 'error' : 'secondary';
+
       const time = entry.ts ? new Date(entry.ts).toLocaleString('tr-TR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit'
       }) : '—';
 
       const jobIdShort = entry.job_id ? entry.job_id.substring(0, 12) + '...' : '—';
-      const errorText = entry.error ?
-        `${entry.error.code || ''} ${entry.error.detail || ''}`.trim() : '';
+      const errorText = entry.error
+        ? `<strong>${entry.error.code || ''}</strong> ${entry.error.detail || ''}`.trim()
+        : '';
+
+      // Hatalı satırları farklı arka plan ile vurgula
+      const rowStyle = isFailed
+        ? 'background: rgba(239,68,68,0.06); border-left: 3px solid #ef4444;'
+        : '';
 
       return `
-        <tr>
-          <td class="font-mono text-secondary">${time}</td>
+        <tr style="${rowStyle}">
+          <td class="font-mono text-secondary" style="font-size: 11px; white-space: nowrap;">${time}</td>
           <td>${entry.op || '—'}</td>
           <td class="font-mono" style="font-size: 11px;">${jobIdShort}</td>
           <td><span class="badge badge-${statusClass}">${entry.status}</span></td>
@@ -560,6 +590,24 @@ class PrinterApp {
         </tr>
       `;
     }).join('');
+  }
+
+  /**
+   * Log otomatik yenilemeyi başlat (30 saniye)
+   */
+  startLogAutoRefresh() {
+    if (this.logRefreshInterval) return;
+    this.logRefreshInterval = setInterval(() => {
+      const activeFilter = document.getElementById('logFilterSelect')?.value || null;
+      this.loadLogs(activeFilter === 'all' ? null : activeFilter);
+    }, 30000);
+  }
+
+  stopLogAutoRefresh() {
+    if (this.logRefreshInterval) {
+      clearInterval(this.logRefreshInterval);
+      this.logRefreshInterval = null;
+    }
   }
 
   /**
@@ -591,6 +639,7 @@ class PrinterApp {
     if (this.statusInterval) {
       clearInterval(this.statusInterval);
     }
+    this.stopLogAutoRefresh();
   }
 }
 

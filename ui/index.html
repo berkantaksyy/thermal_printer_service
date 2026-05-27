@@ -345,7 +345,13 @@
             <span>📝</span>
             <span data-i18n="logs.title">Yazdırma Geçmişi</span>
           </div>
-          <div class="flex gap-sm">
+          <div class="flex gap-sm" style="align-items: center; flex-wrap: wrap;">
+            <span id="logsTotalCount" style="font-size: 12px; color: var(--text-secondary);"></span>
+            <select id="logFilterSelect" class="btn btn-sm btn-secondary" style="cursor:pointer; padding: 4px 8px;">
+              <option value="all">Tümü</option>
+              <option value="failed">❌ Sadece Hatalar</option>
+              <option value="done">✅ Sadece Başarılı</option>
+            </select>
             <button class="btn btn-sm btn-secondary" id="refreshLogsBtn">
               <span>↻</span>
               <span data-i18n="logs.refresh">Yenile</span>

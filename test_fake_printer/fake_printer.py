@@ -375,8 +375,8 @@ class ESCPOSParser:
         
         # Store data (cn=49 '1', fn=80 'P')
         if cn == 0x31 and fn == 0x50:
-            if self.position + 8 + data_len - 3 <= len(self.buffer):
-                qr_data = bytes(self.buffer[self.position + 8:self.position + 8 + data_len - 3])
+            if self.position + 7 + data_len - 3 <= len(self.buffer):
+                qr_data = bytes(self.buffer[self.position + 7:self.position + 7 + data_len - 3])
                 self.position += 3 + data_len + 2
                 try:
                     decoded = qr_data.decode('utf-8')
@@ -737,19 +737,24 @@ class FakePrinterServer:
     def _log(self, message: str):
         """Mesajı konsola ve log dosyasına yaz"""
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        
+
         # Konsola yaz
         print(message)
-        
+
         # Log dosyasına yaz (renk kodları olmadan)
         if self.log_file:
             # ANSI renk kodlarını temizle
             import re
             clean_message = re.sub(r'\033\[[0-9;]+m', '', message)
-            
+
             try:
                 with open(self.log_file, 'a', encoding='utf-8') as f:
-                    f.write(f"[{timestamp}] {clean_message}\n")
+                    # Her satırı ayrı ayrı timestamp ile yaz
+                    for line in clean_message.split('\n'):
+                        if line.strip():
+                            f.write(f"[{timestamp}] {line}\n")
+                        else:
+                            f.write('\n')
             except Exception as e:
                 print(f"{Colors.RED}Log yazma hatası: {e}{Colors.RESET}")
 

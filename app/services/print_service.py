@@ -17,12 +17,29 @@ from app.models.responses import JobResponse
 from app.services.log_service import get_log_service
 from app.services.queue_service import get_queue_service, JobRecord
 from app.services.llm_service import get_llm_service
+from app.services.i18n_service import get_i18n_service
 
 logger = logging.getLogger(__name__)
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _check_printer_status(status: dict, language: Optional[str] = None) -> None:
+    """
+    Status dict'indeki değerleri kontrol et.
+    Değer None ise (sorgu desteklenmiyor) hata fırlatma.
+    Değer False ise seçili dilde PrinterError fırlat.
+    """
+    i18n = get_i18n_service()
+    lang = language or "tr"
+    if status.get("paper_ok") is False:
+        raise PrinterError(PrinterErrorCode.PAPER_OUT, i18n.t("error.paper_out", lang=lang))
+    if status.get("cover_ok") is False:
+        raise PrinterError(PrinterErrorCode.COVER_OPEN, i18n.t("error.cover_open", lang=lang))
+    if status.get("temperature_ok") is False:
+        raise PrinterError(PrinterErrorCode.OVERHEAT, i18n.t("error.overheat", lang=lang))
 
 
 class PrintService:
@@ -56,6 +73,7 @@ class PrintService:
             data=escpos.build_receipt(lines_payload, cut=req.cut),
             log=log,
             conn=printer.connection_type(),
+            language=req.language,
         )
 
     async def print_image(self, req: PrintImageRequest) -> JobResponse:
@@ -86,6 +104,7 @@ class PrintService:
             data=escpos.init() + img_data + (escpos.feed_lines(3) if req.cut else b"") + cut_data,
             log=log,
             conn=printer.connection_type(),
+            language=req.language,
         )
 
     async def print_qr(self, req: PrintQRRequest) -> JobResponse:
@@ -117,6 +136,7 @@ class PrintService:
             data=escpos.init() + qr_data + (escpos.feed_lines(3) if req.cut else b"") + cut_data,
             log=log,
             conn=printer.connection_type(),
+            language=req.language,
         )
 
     async def print_smart(self, req: SmartPrintRequest) -> JobResponse:
@@ -178,7 +198,18 @@ class PrintService:
         conn: str,
     ) -> JobResponse:
         try:
+            # ── Pre-flight: yazdırmadan önce yazıcı durumunu kontrol et ──────
+            pre_status = await printer.get_status()
+            _check_printer_status(pre_status)
+
+            # ── Veriyi gönder ─────────────────────────────────────────────────
             await printer.write(data)
+
+            # ── Post-print: yazıcının işlemi bitirmesi için kısa bekle ────────
+            await asyncio.sleep(0.2)
+            post_status = await printer.get_status()
+            _check_printer_status(post_status)
+
             await log.log(op=rec.op, status="done", conn=conn, job_id=rec.job_id)
             return JobResponse(
                 job_id=rec.job_id,
