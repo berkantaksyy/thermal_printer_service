@@ -119,5 +119,10 @@
     "no": "Nein",
     "optional": "optional",
     "required": "erforderlich"
+  },
+  "footer": {
+    "version": "v1.0.0",
+    "apiDocs": "API-Dokumentation",
+    "github": "GitHub"
   }
 }

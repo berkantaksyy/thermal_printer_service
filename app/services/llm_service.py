@@ -35,9 +35,14 @@ class LlmService:
         settings = get_settings()
         self._enabled = settings.llm_enabled
         self._api_key = settings.groq_api_key
-        self._model = settings.groq_model
+        self._model = settings.groq_model  # openai/gpt-oss-120b
         self._base_url = settings.groq_base_url
         self._client: Optional[OpenAI] = None
+        
+        if self._enabled and self._api_key:
+            logger.info(f"✅ LLM enabled with model: {self._model}")
+        else:
+            logger.info("ℹ️ LLM disabled (using fallback formatting)")
 
     def _get_client(self) -> OpenAI:
         if self._client is None:
@@ -90,24 +95,37 @@ class LlmService:
         except Exception:
             return None
 
-    def _chat(self, prompt: str, max_tokens: int = 512) -> str:
-        """Send a single chat message to Groq and return the response text."""
+    def _chat(self, prompt: str, max_tokens: int = 8192) -> str:
+        """Send a single chat message to Groq with streaming and return the response text."""
         client = self._get_client()
-        response = client.chat.completions.create(
+        
+        # Streaming response
+        completion = client.chat.completions.create(
             model=self._model,
             messages=[
                 {
                     "role": "system",
-                    "content": "Sen kısa ve öz cevaplar veren bir asistansın.",
+                    "content": "Sen termal yazıcı fişleri oluşturan bir asistansın. Kısa, öz ve yapılandırılmış cevaplar verirsin.",
                 },
                 {
                     "role": "user",
                     "content": prompt,
                 },
             ],
-            max_tokens=max_tokens,
+            temperature=1,
+            max_completion_tokens=max_tokens,
+            top_p=1,
+            stream=True,
+            stop=None,
         )
-        return response.choices[0].message.content.strip()
+        
+        # Collect streamed response
+        full_response = ""
+        for chunk in completion:
+            if chunk.choices[0].delta.content:
+                full_response += chunk.choices[0].delta.content
+        
+        return full_response.strip()
 
     def _build_receipt_prompt(
         self,

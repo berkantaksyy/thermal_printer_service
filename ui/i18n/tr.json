@@ -121,5 +121,10 @@
     "no": "Hayır",
     "optional": "opsiyonel",
     "required": "zorunlu"
+  },
+  "footer": {
+    "version": "v1.0.0",
+    "apiDocs": "API Dokümantasyonu",
+    "github": "GitHub"
   }
 }

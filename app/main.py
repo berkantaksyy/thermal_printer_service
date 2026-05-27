@@ -44,29 +44,88 @@ def create_app() -> FastAPI:
     settings = get_settings()
 
     app = FastAPI(
-        title="🖨️ Termal Yazıcı Servisi",
+        title="Termal Yazıcı Servisi API",
         version=settings.app_version,
-        description=(
-            "**Cashino KP-300 / KP-301H** termal yazıcılar için REST API servisi.\n\n"
-            "### Özellikler\n"
-            "- 🔌 USB ve LAN bağlantı desteği\n"
-            "- 📝 Metin, görsel ve QR kod yazdırma\n"
-            "- 🤖 Yapay zeka destekli akıllı yazdırma (opsiyonel)\n"
-            "- 🌍 Çoklu dil desteği (TR/EN/DE/FR)\n"
-            "- 📊 Detaylı loglama ve kuyruk yönetimi\n\n"
-            "### Kimlik Doğrulama\n"
-            "`/health` endpoint'i hariç tüm istekler Bearer token gerektirir:\n"
-            "```\nAuthorization: Bearer your-token-here\n```\n\n"
-            "Token'ı `.env` dosyasında `API_BEARER_TOKEN` ile ayarlayın."
-        ),
+        description="""
+# Cashino KP-300 / KP-301H Termal Yazıcı REST API
+
+Profesyonel termal yazıcı yönetimi için eksiksiz REST API servisi.
+
+## Temel Özellikler
+
+### Bağlantı Yönetimi
+- **USB Bağlantı**: Plug-and-play USB desteği
+- **LAN Bağlantı**: Ağ üzerinden IP/Port ile bağlantı
+- **Otomatik Yeniden Bağlanma**: Bağlantı kopması durumunda otomatik deneme
+
+### Yazdırma Yetenekleri
+- **Metin Yazdırma**: Formatlanmış metin satırları (kalın, altı çizili, hizalama, font boyutu)
+- **Görsel Yazdırma**: PNG/JPEG formatında base64 kodlu görseller
+- **QR Kod**: Özelleştirilebilir boyut ve hata düzeltme seviyesi
+- **Akıllı Yazdırma**: Yapay zeka destekli otomatik fiş formatı (opsiyonel)
+
+### Sistem Özellikleri
+- **Çoklu Dil**: Türkçe, İngilizce, Almanca, Fransızca
+- **Detaylı Loglama**: JSON formatında yapılandırılmış loglar
+- **Kuyruk Yönetimi**: Başarısız işleri yeniden yazdırma
+- **Durum İzleme**: Gerçek zamanlı yazıcı durumu ve metrikler
+
+## Kimlik Doğrulama
+
+Tüm endpoint'ler (sadece `/health` hariç) Bearer token ile korunmaktadır:
+
+```
+Authorization: Bearer your-secret-token
+```
+
+Token'ı `.env` dosyasında `API_BEARER_TOKEN` değişkeni ile ayarlayın.
+
+## Hızlı Başlangıç
+
+1. Yazıcıya bağlanın: `POST /connect`
+2. Durum kontrolü yapın: `GET /status`
+3. Yazdırma işlemi gönderin: `POST /print/text`
+4. Logları kontrol edin: `GET /logs`
+
+## Hata Yönetimi
+
+Tüm hatalar standart HTTP durum kodları ve detaylı hata mesajları ile döner:
+- **400**: Geçersiz istek parametreleri
+- **401**: Kimlik doğrulama hatası
+- **404**: Kaynak bulunamadı
+- **503**: Yazıcı hatası (kağıt bitti, kapak açık, vb.)
+
+## Dil Desteği
+
+Her endpoint `language` parametresi ile dil seçimi yapabilir:
+- `tr`: Türkçe
+- `en`: English
+- `de`: Deutsch
+- `fr`: Français
+
+Varsayılan dil `.env` dosyasında `DEFAULT_LANGUAGE` ile ayarlanır.
+
+## Teknik Detaylar
+
+- **Framework**: FastAPI (Python)
+- **Yazıcı Protokolü**: ESC/POS
+- **Bağlantı**: USB (pyusb) ve LAN (asyncio TCP)
+- **Log Formatı**: JSON Lines
+- **Donanım**: Cashino KP-300 / KP-301H (80mm, 203 DPI)
+        """,
         docs_url="/docs",
         redoc_url="/redoc",
         lifespan=lifespan,
         swagger_ui_parameters={
-            "defaultModelsExpandDepth": -1,  # Model şemalarını gizle
-            "docExpansion": "list",  # Endpoint'leri liste olarak göster
-            "filter": True,  # Arama kutusu ekle
-            "syntaxHighlight.theme": "monokai",  # Dark tema
+            "defaultModelsExpandDepth": -1,
+            "docExpansion": "none",
+            "filter": True,
+            "syntaxHighlight.theme": "monokai",
+            "displayRequestDuration": True,
+            "persistAuthorization": True,
+            "tryItOutEnabled": True,
+            "deepLinking": True,
+            "displayOperationId": False,
         }
     )
 

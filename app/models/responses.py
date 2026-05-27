@@ -4,62 +4,184 @@ Response models for all API endpoints.
 
 from typing import Optional, Any, Literal
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ErrorDetail(BaseModel):
-    code: str
-    detail: str
+    """Hata detay bilgisi"""
+    code: str = Field(description="Hata kodu (PAPER_OUT, COMM_ERROR, vb.)")
+    detail: str = Field(description="Hata açıklaması")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "code": "PAPER_OUT",
+                    "detail": "Kağıt bitti. Lütfen kağıt yükleyin ve tekrar deneyin."
+                }
+            ]
+        }
+    }
 
 
 class JobResponse(BaseModel):
-    job_id: str
-    status: Literal["queued", "printing", "done", "failed"]
-    message: str
-    timestamp: datetime
+    """Yazdırma işi yanıtı"""
+    job_id: str = Field(description="İş kimliği")
+    status: Literal["queued", "printing", "done", "failed"] = Field(description="İş durumu")
+    message: str = Field(description="Durum mesajı")
+    timestamp: datetime = Field(description="İşlem zamanı (UTC)")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "job_id": "receipt-001",
+                    "status": "done",
+                    "message": "Yazdırma işlemi başarıyla tamamlandı",
+                    "timestamp": "2026-05-27T00:00:00Z"
+                }
+            ]
+        }
+    }
 
 
 class ConnectResponse(BaseModel):
-    status: Literal["connected", "disconnected", "error"]
-    connection_type: Optional[Literal["usb", "lan"]] = None
-    message: str
-    timestamp: datetime
+    """Bağlantı işlemi yanıtı"""
+    status: Literal["connected", "disconnected", "error"] = Field(description="Bağlantı durumu")
+    connection_type: Optional[Literal["usb", "lan"]] = Field(None, description="Bağlantı tipi")
+    message: str = Field(description="Durum mesajı")
+    timestamp: datetime = Field(description="İşlem zamanı (UTC)")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "status": "connected",
+                    "connection_type": "usb",
+                    "message": "Yazıcıya başarıyla bağlanıldı",
+                    "timestamp": "2026-05-27T00:00:00Z"
+                },
+                {
+                    "status": "connected",
+                    "connection_type": "lan",
+                    "message": "Yazıcıya başarıyla bağlanıldı",
+                    "timestamp": "2026-05-27T00:00:00Z"
+                }
+            ]
+        }
+    }
 
 
 class StatusResponse(BaseModel):
-    connected: bool
-    connection_type: Optional[Literal["usb", "lan"]] = None
-    printer_model: str = "Cashino KP-300/KP-301H"
-    paper_ok: Optional[bool] = None
-    cover_ok: Optional[bool] = None
-    temperature_ok: Optional[bool] = None
-    active_job_id: Optional[str] = None
-    queue_size: int = 0
-    uptime_seconds: float = 0.0
-    timestamp: datetime
+    """Yazıcı durum bilgisi"""
+    connected: bool = Field(description="Yazıcı bağlı mı?")
+    connection_type: Optional[Literal["usb", "lan"]] = Field(None, description="Bağlantı tipi")
+    printer_model: str = Field("Cashino KP-300/KP-301H", description="Yazıcı modeli")
+    paper_ok: Optional[bool] = Field(None, description="Kağıt durumu (True: OK, False: Bitti)")
+    cover_ok: Optional[bool] = Field(None, description="Kapak durumu (True: Kapalı, False: Açık)")
+    temperature_ok: Optional[bool] = Field(None, description="Sıcaklık durumu (True: Normal, False: Aşırı ısınma)")
+    active_job_id: Optional[str] = Field(None, description="Aktif iş kimliği")
+    queue_size: int = Field(0, description="Kuyruktaki iş sayısı")
+    uptime_seconds: float = Field(0.0, description="Yazıcı çalışma süresi (saniye)")
+    timestamp: datetime = Field(description="Sorgu zamanı (UTC)")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "connected": True,
+                    "connection_type": "usb",
+                    "printer_model": "Cashino KP-300/KP-301H",
+                    "paper_ok": True,
+                    "cover_ok": True,
+                    "temperature_ok": True,
+                    "active_job_id": None,
+                    "queue_size": 0,
+                    "uptime_seconds": 3600.5,
+                    "timestamp": "2026-05-27T00:00:00Z"
+                }
+            ]
+        }
+    }
 
 
 class LogEntry(BaseModel):
-    ts: str                           # ISO-8601
-    op: str                           # operation name
-    conn: Optional[str] = None       # usb | lan | None
-    job_id: Optional[str] = None
-    status: str                       # done | failed | info
-    error: Optional[ErrorDetail] = None
+    """Log kaydı"""
+    ts: str = Field(description="Zaman damgası (ISO-8601)")
+    op: str = Field(description="İşlem adı (print_text, connect, vb.)")
+    conn: Optional[str] = Field(None, description="Bağlantı tipi (usb/lan)")
+    job_id: Optional[str] = Field(None, description="İş kimliği")
+    status: str = Field(description="Durum (done/failed/info)")
+    error: Optional[ErrorDetail] = Field(None, description="Hata detayı (varsa)")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "ts": "2026-05-27T00:00:00Z",
+                    "op": "print_text",
+                    "conn": "usb",
+                    "job_id": "receipt-001",
+                    "status": "done",
+                    "error": None
+                }
+            ]
+        }
+    }
 
 
 class LogsResponse(BaseModel):
-    total: int
-    entries: list[LogEntry]
-    page: int = 1
-    page_size: int = 100
+    """Log listesi yanıtı"""
+    total: int = Field(description="Toplam log sayısı")
+    entries: list[LogEntry] = Field(description="Log kayıtları")
+    page: int = Field(1, description="Mevcut sayfa")
+    page_size: int = Field(100, description="Sayfa başına kayıt")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "total": 150,
+                    "entries": [
+                        {
+                            "ts": "2026-05-27T00:00:00Z",
+                            "op": "print_text",
+                            "conn": "usb",
+                            "job_id": "receipt-001",
+                            "status": "done",
+                            "error": None
+                        }
+                    ],
+                    "page": 1,
+                    "page_size": 100
+                }
+            ]
+        }
+    }
 
 
 class HealthResponse(BaseModel):
-    status: Literal["ok", "degraded"]
-    version: str
-    uptime_seconds: float
-    printer_connected: bool
-    queue_size: int
-    memory_mb: float
-    timestamp: datetime
+    """Servis sağlık durumu"""
+    status: Literal["ok", "degraded"] = Field(description="Servis durumu")
+    version: str = Field(description="Servis versiyonu")
+    uptime_seconds: float = Field(description="Servis çalışma süresi (saniye)")
+    printer_connected: bool = Field(description="Yazıcı bağlı mı?")
+    queue_size: int = Field(description="Kuyruktaki iş sayısı")
+    memory_mb: float = Field(description="Bellek kullanımı (MB)")
+    timestamp: datetime = Field(description="Sorgu zamanı (UTC)")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "status": "ok",
+                    "version": "1.0.0",
+                    "uptime_seconds": 7200.5,
+                    "printer_connected": True,
+                    "queue_size": 0,
+                    "memory_mb": 45.23,
+                    "timestamp": "2026-05-27T00:00:00Z"
+                }
+            ]
+        }
+    }

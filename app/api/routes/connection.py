@@ -13,32 +13,86 @@ from app.models.responses import ConnectResponse
 from app.services.log_service import get_log_service
 from app.services.i18n_service import get_i18n_service
 
-router = APIRouter(prefix="/connect", tags=["🔌 Bağlantı"])
+router = APIRouter(prefix="/connect", tags=["Bağlantı"])
 
 
-@router.post("", response_model=ConnectResponse, dependencies=[Depends(verify_token)])
+@router.post(
+    "",
+    response_model=ConnectResponse,
+    dependencies=[Depends(verify_token)],
+    summary="Yazıcıya Bağlan",
+    description="""
+Termal yazıcıya USB veya LAN üzerinden bağlantı kurar.
+
+## Bağlantı Tipleri
+
+### USB Bağlantısı
+Yazıcı USB kablosu ile bilgisayara bağlıysa bu yöntemi kullanın.
+- Vendor ID ve Product ID otomatik algılanır
+- Özel değerler belirtmek isterseniz `usb_vendor_id` ve `usb_product_id` parametrelerini kullanabilirsiniz
+
+### LAN Bağlantısı
+Yazıcı ağa bağlıysa IP adresi ve port ile bağlanın.
+- Varsayılan port: 9100 (RAW printing standardı)
+- Yazıcının IP adresini yazıcı ayarlarından veya ağ taraması ile bulabilirsiniz
+
+## Özellikler
+- Mevcut bağlantı varsa otomatik olarak kesilir
+- Bağlantı başarısız olursa otomatik yeniden deneme mekanizması devreye girer
+- Tüm bağlantı işlemleri loglanır
+
+## Hata Durumları
+- **503 Service Unavailable**: Yazıcı bulunamadı veya bağlantı kurulamadı
+- **400 Bad Request**: Geçersiz parametreler
+    """,
+    response_description="Bağlantı başarıyla kuruldu",
+    responses={
+        200: {
+            "description": "Yazıcıya başarıyla bağlanıldı",
+            "content": {
+                "application/json": {
+                    "examples": {
+                        "usb": {
+                            "summary": "USB Bağlantısı",
+                            "value": {
+                                "status": "connected",
+                                "connection_type": "usb",
+                                "message": "Yazıcıya başarıyla bağlanıldı",
+                                "timestamp": "2026-05-27T00:00:00Z"
+                            }
+                        },
+                        "lan": {
+                            "summary": "LAN Bağlantısı",
+                            "value": {
+                                "status": "connected",
+                                "connection_type": "lan",
+                                "message": "Yazıcıya başarıyla bağlanıldı",
+                                "timestamp": "2026-05-27T00:00:00Z"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        503: {
+            "description": "Yazıcıya bağlanılamadı",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": {
+                            "error": {
+                                "code": "COMM_ERROR",
+                                "detail": "Yazıcı bulunamadı. USB bağlantısını kontrol edin."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+)
 async def connect(req: ConnectRequest):
-    """
-    Yazıcıya bağlan (USB veya LAN).
-    
-    **USB Bağlantısı:**
-    ```json
-    {
-      "connection_type": "usb"
-    }
-    ```
-    
-    **LAN Bağlantısı:**
-    ```json
-    {
-      "connection_type": "lan",
-      "lan_host": "192.168.1.100",
-      "lan_port": 9100
-    }
-    ```
-    
-    Mevcut bağlantı varsa önce kesilir, sonra yeni bağlantı kurulur.
-    """
+    """Yazıcıya bağlan"""
     log = get_log_service()
     i18n = get_i18n_service()
 
@@ -80,13 +134,43 @@ async def connect(req: ConnectRequest):
         raise printer_error_to_http(err)
 
 
-@router.post("/disconnect", response_model=ConnectResponse, dependencies=[Depends(verify_token)])
+@router.post(
+    "/disconnect",
+    response_model=ConnectResponse,
+    dependencies=[Depends(verify_token)],
+    summary="Bağlantıyı Kes",
+    description="""
+Yazıcı ile olan aktif bağlantıyı güvenli bir şekilde sonlandırır.
+
+## Ne Zaman Kullanılır?
+- Yazıcıyı başka bir uygulama kullanacaksa
+- Servis kapatılmadan önce temiz bir şekilde bağlantıyı kesmek için
+- Bağlantı tipini değiştirmek için (USB'den LAN'a veya tersi)
+
+## Özellikler
+- Aktif yazdırma işi varsa tamamlanmasını bekler
+- Bağlantı yoksa hata vermez, başarılı yanıt döner
+- Tüm işlemler loglanır
+    """,
+    response_description="Bağlantı başarıyla kesildi",
+    responses={
+        200: {
+            "description": "Bağlantı kesildi",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "disconnected",
+                        "connection_type": None,
+                        "message": "Bağlantı kesildi",
+                        "timestamp": "2026-05-27T00:00:00Z"
+                    }
+                }
+            }
+        }
+    }
+)
 async def disconnect():
-    """
-    Yazıcı bağlantısını kes.
-    
-    Aktif bağlantı varsa güvenli bir şekilde kesilir.
-    """
+    """Bağlantıyı kes"""
     log = get_log_service()
     i18n = get_i18n_service()
 
