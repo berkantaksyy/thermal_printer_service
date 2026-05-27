@@ -20,8 +20,9 @@ FastAPI (Python) ile geliştirilmiştir.
 
 > [!WARNING]
 > **Akıllı Yazdırma (AI) — `LLM_ENABLED` varsayılan olarak `false`'tur.**
-> OpenRouter API anahtarınız yoksa `.env` dosyasında `LLM_ENABLED=false` bırakın.
+> Groq API anahtarınız yoksa `.env` dosyasında `LLM_ENABLED=false` bırakın.
 > API anahtarı olmadan `true` yaparsanız `/print/smart` endpoint'i hata verir.
+> Ücretsiz Groq API anahtarı için: https://console.groq.com
 > Servis, LLM olmadan **tam işlevsel** çalışır — AI sadece opsiyonel bir bonus özelliktir.
 
 ---
@@ -147,8 +148,9 @@ privileged: true
 | `LOG_KEEP_DAYS` | `30` | Log tutma süresi (gün) |
 | `DEFAULT_LANGUAGE` | `en` | Varsayılan dil |
 | `LLM_ENABLED` | `false` | LLM özelliğini etkinleştir |
-| `OPENROUTER_API_KEY` | — | OpenRouter API anahtarı (LLM etkinse) |
-| `OPENROUTER_MODEL` | `mistralai/mistral-7b-instruct:free` | LLM modeli |
+| `GROQ_API_KEY` | — | Groq API anahtarı — [console.groq.com](https://console.groq.com) (ücretsiz) |
+| `GROQ_MODEL` | `llama3-8b-8192` | Kullanılacak model (ör: `openai/gpt-oss-120b`) |
+| `GROQ_BASE_URL` | `https://api.groq.com/openai/v1` | Groq OpenAI-uyumlu API adresi |
 
 ### API Referansı
 

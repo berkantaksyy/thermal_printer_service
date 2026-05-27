@@ -45,7 +45,7 @@ app/
 │   └── responses.py             # Pydantic v2 yanıt modelleri
 ├── services/
 │   ├── i18n_service.py          # Dil çevirisi yükleyici
-│   ├── llm_service.py           # OpenRouter LLM entegrasyonu (opsiyonel)
+│   ├── llm_service.py           # Groq LLM entegrasyonu (opsiyonel)
 │   ├── log_service.py           # JSONL loglama + CSV dışa aktarma
 │   ├── paper_service.py         # Kağıt rulo tahmin servisi
 │   ├── print_service.py         # Yazdırma iş akışı orkestrasyonu
@@ -116,8 +116,9 @@ async def require_token(credentials: HTTPAuthorizationCredentials = Depends(secu
 | `LOG_KEEP_DAYS` | int | Log tutma süresi |
 | `DEFAULT_LANGUAGE` | str | Varsayılan dil kodu |
 | `LLM_ENABLED` | bool | LLM özelliği etkin mi |
-| `OPENROUTER_API_KEY` | str | OpenRouter API anahtarı |
-| `OPENROUTER_MODEL` | str | LLM modeli |
+| `GROQ_API_KEY` | str | Groq API anahtarı ([console.groq.com](https://console.groq.com)) |
+| `GROQ_MODEL` | str | Kullanılacak model (ör: `openai/gpt-oss-120b`) |
+| `GROQ_BASE_URL` | str | Groq OpenAI-uyumlu API adresi |
 
 ---
 
@@ -303,7 +304,7 @@ Her istek `language` parametresi ile dil belirtebilir. Belirtilmezse `DEFAULT_LA
 
 #### `services/llm_service.py` — LLM Servisi (Opsiyonel)
 
-`LLM_ENABLED=true` ayarlandığında aktif olur. OpenRouter API üzerinden herhangi bir modeli kullanabilir.
+`LLM_ENABLED=true` ayarlandığında aktif olur. **Groq** API kullanır (OpenAI-uyumlu endpoint). Ücretsiz API anahtarı için: [console.groq.com](https://console.groq.com)
 
 ```python
 class LLMService:
@@ -437,7 +438,7 @@ app/
 │   ├── queue_service.py # In-memory queue + failed job persistence
 │   ├── i18n_service.py  # Translation loader
 │   ├── paper_service.py # Paper roll estimation
-│   └── llm_service.py   # Optional OpenRouter LLM
+│   └── llm_service.py   # Optional Groq LLM
 └── i18n/
     ├── en.json / tr.json / de.json / fr.json
 ```
