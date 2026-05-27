@@ -97,6 +97,11 @@
       "done": "Erledigt",
       "failed": "Fehlgeschlagen",
       "info": "Info"
+    },
+    "filter": {
+      "all": "Alle",
+      "failed": "❌ Nur Fehler",
+      "done": "✅ Nur Erfolgreiche"
     }
   },
   "toast": {
@@ -124,5 +129,43 @@
     "version": "v1.0.0",
     "apiDocs": "API-Dokumentation",
     "github": "GitHub"
+  },
+  "aco": {
+    "title": "ACO Recycling Belohnungsbon",
+    "form_description": "Standard-Belohnungsbeleg für Rücknahmeautomat — MaschinenID, Belohnung, Produkttabelle und QR-Code",
+    "machine_id": "Maschinen-ID",
+    "reward_amount": "Belohnungsbetrag",
+    "currency": "Währung",
+    "products_heading": "Produktmengen",
+    "glass": "Glas",
+    "plastic": "Plastik",
+    "metal": "Metall",
+    "tetrapak": "Tetrapak",
+    "qr_label": "QR-Code-Daten (URL)",
+    "template_label": "Vorlagenname (optional)",
+    "template_default": "ACO Recycling Standard-Belohnung",
+    "print_button": "ACO-Beleg drucken"
+  },
+  "paper": {
+    "section_header": "PAPIERROLLE",
+    "stats_title": "Papierrollenabschätzung",
+    "reset_button": "Neue Rolle eingelegt",
+    "note": "Alle Werte sind Schätzungen — der Drucker meldet keine tatsächliche Papierlänge.",
+    "total": "Gesamtrolle",
+    "used": "Verwendet",
+    "print_count": "Drucke auf dieser Rolle",
+    "avg_per_print": "Durchschn. pro Druck",
+    "remaining_m": "m übrig",
+    "remaining_pct": "verbleibend",
+    "prints_remaining": "Drucke verbleibend (geschätzt)",
+    "print_count_unit": "Drucke",
+    "low_warning": "Papier wird knapp",
+    "critical_warning": "Rolle sofort ersetzen!",
+    "reset_done": "Neuer Rollenzähler zurückgesetzt!",
+    "reset_error": "Rolle konnte nicht zurückgesetzt werden"
+  },
+  "settings": {
+    "printerLang": "Druckernachrichtensprache",
+    "printerLangHint": "Sprache für Fehler- und Erfolgsmeldungen"
   }
 }

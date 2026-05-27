@@ -99,6 +99,11 @@
       "done": "Başarılı",
       "failed": "Başarısız",
       "info": "Bilgi"
+    },
+    "filter": {
+      "all": "Tümü",
+      "failed": "❌ Sadece Hatalar",
+      "done": "✅ Sadece Başarılı"
     }
   },
   "toast": {
@@ -126,5 +131,43 @@
     "version": "v1.0.0",
     "apiDocs": "API Dokümantasyonu",
     "github": "GitHub"
+  },
+  "aco": {
+    "title": "ACO Recycling Ödül Fişi",
+    "form_description": "Geri dönüşüm makinesi için standart ödül fişi — MachineID, ödül, ürün tablosu ve QR kod",
+    "machine_id": "Makine ID",
+    "reward_amount": "Ödül Miktarı",
+    "currency": "Para Birimi",
+    "products_heading": "Ürün Adetleri",
+    "glass": "Cam",
+    "plastic": "Plastik",
+    "metal": "Metal",
+    "tetrapak": "Tetrapak",
+    "qr_label": "QR Kod Verisi (URL)",
+    "template_label": "Şablon Adı (opsiyonel)",
+    "template_default": "ACO Recycling Varsayılan Ödül",
+    "print_button": "ACO Fişi Yazdır"
+  },
+  "paper": {
+    "section_header": "RULO DURUMU",
+    "stats_title": "Kağıt Rulo Tahmini",
+    "reset_button": "Yeni Rulo Taktım",
+    "note": "Tüm değerler tahmindir — yazıcı gerçek kağıt uzunluğunu raporlamaz.",
+    "total": "Toplam Rulo",
+    "used": "Kullanılan",
+    "print_count": "Bu Rulodaki Baskı",
+    "avg_per_print": "Baskı Başına Ort.",
+    "remaining_m": "m kaldı",
+    "remaining_pct": "kaldı",
+    "prints_remaining": "baskı kaldı (tahmini)",
+    "print_count_unit": "baskı",
+    "low_warning": "Kağıt bitmek üzere",
+    "critical_warning": "Ruloyu hemen değiştirin!",
+    "reset_done": "Yeni rulo sayacı sıfırlandı!",
+    "reset_error": "Rulo sıfırlanamadı"
+  },
+  "settings": {
+    "printerLang": "Yazıcı Mesaj Dili",
+    "printerLangHint": "Hata ve başarı mesajlarının dili"
   }
 }

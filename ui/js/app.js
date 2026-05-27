@@ -28,6 +28,9 @@ class PrinterApp {
     // Logları yükle
     await this.loadLogs();
 
+    // Rulo durumunu yükle
+    await this.loadPaperStats();
+
     // Log otomatik yenileme başlat (30 saniye)
     this.startLogAutoRefresh();
 
@@ -152,6 +155,12 @@ class PrinterApp {
       refreshStatusBtn.addEventListener('click', () => this.refreshStatus());
     }
 
+    // Rulo sıfırlama butonları
+    ['paperResetBtn', 'paperResetBtnBanner'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.addEventListener('click', () => this.resetPaperRoll());
+    });
+
     // Image dropzone
     const imageDropzone = document.getElementById('imageDropzone');
     if (imageDropzone) {
@@ -201,6 +210,10 @@ class PrinterApp {
       if (memory) {
         memory.textContent = `${health.memory_mb || 0} MB`;
       }
+
+      // Kağıt durumu (health'den gelen hızlı veri)
+      const pct = health.paper_remaining_pct ?? 100;
+      this._updatePaperBar(pct);
 
     } catch (error) {
       console.error('Status refresh error:', error);
@@ -287,6 +300,89 @@ class PrinterApp {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // PAPER ROLL
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Rulo durumunu API'den çek ve UI'ı güncelle
+   */
+  async loadPaperStats() {
+    try {
+      const stats = await api.request('GET', '/paper');
+      this._renderPaperStats(stats);
+    } catch (e) {
+      console.warn('Paper stats unavailable:', e);
+    }
+  }
+
+  _updatePaperBar(pct) {
+    const fill = document.getElementById('paperBarFill');
+    const label = document.getElementById('paperPct');
+    if (!fill || !label) return;
+
+    const color = pct > 50 ? '#22c55e' : pct > 20 ? '#f59e0b' : '#ef4444';
+    fill.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+    fill.style.background = color;
+    label.textContent = `${pct.toFixed(0)}%`;
+    label.style.color = color;
+
+    // Uyarı bandı
+    const banner = document.getElementById('paperWarningBanner');
+    const warningText = document.getElementById('paperWarningText');
+    if (banner && warningText) {
+      if (pct <= 10) {
+        banner.classList.remove('hidden');
+        banner.style.display = 'flex';
+        warningText.textContent = `⚠️ ${i18n.t('paper.critical_warning')} (%${pct.toFixed(0)} ${i18n.t('paper.remaining_pct')})`;
+      } else if (pct <= 20) {
+        banner.classList.remove('hidden');
+        banner.style.display = 'flex';
+        warningText.textContent = `⚠️ ${i18n.t('paper.low_warning')} (%${pct.toFixed(0)} ${i18n.t('paper.remaining_pct')})`;
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+  }
+
+  _renderPaperStats(stats) {
+    if (!stats) return;
+    const pct = stats.remaining_pct ?? 100;
+
+    // Progress bar (main)
+    const mainBar = document.getElementById('paperProgressBar');
+    const color = pct > 50 ? '#22c55e' : pct > 20 ? '#f59e0b' : '#ef4444';
+    if (mainBar) {
+      mainBar.style.width = `${Math.max(0, pct)}%`;
+      mainBar.style.background = color;
+    }
+
+    // Labels (i18n-aware)
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('paperRemainingLabel', `${pct.toFixed(1)}% — ${stats.remaining_m} ${i18n.t('paper.remaining_m')}`);
+    set('paperPrintsLabel', `~${stats.prints_remaining} ${i18n.t('paper.prints_remaining')}`);
+    set('paperTotal', `${(stats.total_roll_mm / 1000).toFixed(0)} m`);
+    set('paperUsed', `${(stats.used_mm / 1000).toFixed(2)} m`);
+    set('paperPrintCount', `${stats.print_count} ${i18n.t('paper.print_count_unit')}`);
+    set('paperAvg', `${stats.avg_mm_per_print} mm`);
+
+    this._updatePaperBar(pct);
+  }
+
+  async resetPaperRoll() {
+    const btn = document.getElementById('paperResetBtn');
+    try {
+      if (btn) ui.setButtonLoading(btn, true);
+      await api.request('POST', `/paper/reset?language=${this.getPrinterLanguage()}`);
+      ui.success(`🗞️ ${i18n.t('paper.reset_done')}`);
+      await this.loadPaperStats();
+    } catch (e) {
+      ui.error(i18n.t('paper.reset_error'));
+    } finally {
+      if (btn) ui.setButtonLoading(btn, false);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // PRINT HELPERS
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -350,7 +446,7 @@ class PrinterApp {
       document.getElementById('textContent').value = '';
 
       // Logları yenile
-      setTimeout(() => this.loadLogs(), 1000);
+      setTimeout(() => { this.loadLogs(); this.loadPaperStats(); }, 1000);
 
     } catch (error) {
       ui.error(error instanceof APIError ? error.getUserMessage() : error.message);
@@ -408,7 +504,7 @@ class PrinterApp {
         document.getElementById('qrLabel').value = '';
       }
 
-      setTimeout(() => this.loadLogs(), 1000);
+      setTimeout(() => { this.loadLogs(); this.loadPaperStats(); }, 1000);
 
     } catch (error) {
       ui.error(error instanceof APIError ? error.getUserMessage() : error.message);
@@ -495,7 +591,7 @@ class PrinterApp {
       
       this.selectedImageFile = null;
       
-      setTimeout(() => this.loadLogs(), 1000);
+      setTimeout(() => { this.loadLogs(); this.loadPaperStats(); }, 1000);
 
     } catch (error) {
       ui.error(error instanceof APIError ? error.getUserMessage() : error.message);
@@ -548,7 +644,7 @@ class PrinterApp {
       // Önizlemeyi göster
       this.showReceiptPreview('smart', { data: JSON.parse(jsonData), hint, jobId: result.job_id });
 
-      setTimeout(() => this.loadLogs(), 1000);
+      setTimeout(() => { this.loadLogs(); this.loadPaperStats(); }, 1000);
 
     } catch (error) {
       ui.error(error instanceof APIError ? error.getUserMessage() : error.message);
@@ -616,7 +712,7 @@ class PrinterApp {
         jobId: result.job_id,
       });
 
-      setTimeout(() => this.loadLogs(), 1000);
+      setTimeout(() => { this.loadLogs(); this.loadPaperStats(); }, 1000);
 
     } catch (error) {
       ui.error(error instanceof APIError ? error.getUserMessage() : error.message);
@@ -829,35 +925,40 @@ class PrinterApp {
     // Language labels
     const lang = this.getPrinterLanguage();
     const LABELS = {
-      tr: { product: 'Ürün', quantity: 'Miktar', reward: 'Puan', glass: 'Cam', plastic: 'Plastik', metal: 'Metal', tetrapak: 'Tetrapak', rewardLabel: 'Ödül' },
-      en: { product: 'Product', quantity: 'Quantity', reward: 'Reward', glass: 'Glass', plastic: 'Plastic', metal: 'Metal', tetrapak: 'Tetrapak', rewardLabel: 'Reward' },
-      de: { product: 'Produkt', quantity: 'Menge', reward: 'Punkte', glass: 'Glas', plastic: 'Plastik', metal: 'Metall', tetrapak: 'Tetrapak', rewardLabel: 'Belohnung' },
-      fr: { product: 'Produit', quantity: 'Quantité', reward: 'Points', glass: 'Verre', plastic: 'Plastique', metal: 'Métal', tetrapak: 'Tetrapak', rewardLabel: 'Récompense' },
+      tr: { product: 'Ürün', quantity: 'Miktar', reward: 'Puan', glass: 'Cam', plastic: 'Plastik', metal: 'Metal', tetrapak: 'Tetrapak', rewardLabel: 'ÖDÜL' },
+      en: { product: 'Product', quantity: 'Qty', reward: 'Pts', glass: 'Glass', plastic: 'Plastic', metal: 'Metal', tetrapak: 'Tetrapak', rewardLabel: 'REWARD' },
+      de: { product: 'Produkt', quantity: 'Menge', reward: 'Pkt', glass: 'Glas', plastic: 'Plastik', metal: 'Metall', tetrapak: 'Tetrapak', rewardLabel: 'BELOHNUNG' },
+      fr: { product: 'Produit', quantity: 'Qté', reward: 'Pts', glass: 'Verre', plastic: 'Plastique', metal: 'Métal', tetrapak: 'Tetrapak', rewardLabel: 'RÉCOMPENSE' },
     };
     const L = LABELS[lang] || LABELS['en'];
 
-    // ── Header ────────────────────────────────────────────────────────────
-    const logoDiv = document.createElement('div');
-    logoDiv.style.cssText = 'text-align:center; padding: 6px 0 2px;';
-    logoDiv.innerHTML = `
-      <div style="font-size:18px; font-weight:900; letter-spacing:1px; color:#111;">
-        ♻️ ACO RECYCLING
-      </div>
-      <div style="font-size:10px; color:#555; margin-top:1px;">reverse vending recycling systems</div>
+    // ── Green header band ─────────────────────────────────────────────────
+    const headerBand = document.createElement('div');
+    headerBand.style.cssText = `
+      background: linear-gradient(135deg, #1a7a1a 0%, #27ae60 100%);
+      color: #fff;
+      text-align: center;
+      padding: 10px 8px 8px;
+      border-radius: 2px 2px 0 0;
+      margin: -8px -18px 0 -18px;
     `;
-    body.appendChild(logoDiv);
-
-    const hr0 = document.createElement('hr');
-    hr0.className = 'receipt-divider';
-    body.appendChild(hr0);
+    headerBand.innerHTML = `
+      <div style="font-size:17px; font-weight:900; letter-spacing:2px; text-shadow:0 1px 2px rgba(0,0,0,0.4);">
+        ♻ ACO RECYCLING
+      </div>
+      <div style="font-size:9px; letter-spacing:1px; opacity:0.88; margin-top:2px; text-transform:uppercase;">
+        reverse vending recycling systems
+      </div>
+    `;
+    body.appendChild(headerBand);
 
     // ── Machine info ──────────────────────────────────────────────────────
     const machineDiv = document.createElement('div');
-    machineDiv.style.cssText = 'text-align:center; font-size:11px; line-height:1.6;';
+    machineDiv.style.cssText = 'text-align:center; font-size:10.5px; line-height:1.7; padding:7px 0 4px; color:#333;';
     machineDiv.innerHTML = `
-      <strong>MachineID: ${machineId}</strong><br>
-      ${now}<br>
-      <span style="color:#555;">${templateName}</span>
+      <span style="font-weight:700; color:#111;">MachineID: ${machineId}</span><br>
+      <span>${now}</span><br>
+      <span style="color:#666; font-size:10px;">${templateName}</span>
     `;
     body.appendChild(machineDiv);
 
@@ -865,11 +966,21 @@ class PrinterApp {
     hr1.className = 'receipt-divider';
     body.appendChild(hr1);
 
-    // ── Reward amount ─────────────────────────────────────────────────────
-    const rewardDiv = document.createElement('div');
-    rewardDiv.style.cssText = 'text-align:center; font-size:22px; font-weight:900; padding: 6px 0;';
-    rewardDiv.textContent = `${L.rewardLabel}: ${reward.toFixed(2)} ${sym}`;
-    body.appendChild(rewardDiv);
+    // ── Reward amount (large, green) ──────────────────────────────────────
+    const rewardBlock = document.createElement('div');
+    rewardBlock.style.cssText = `
+      text-align: center;
+      padding: 8px 0 6px;
+    `;
+    rewardBlock.innerHTML = `
+      <div style="font-size:10px; color:#666; letter-spacing:1px; text-transform:uppercase; margin-bottom:2px;">
+        ${L.rewardLabel}
+      </div>
+      <div style="font-size:28px; font-weight:900; color:#1a7a1a; letter-spacing:1px; line-height:1.1;">
+        ${reward.toFixed(2)} ${sym}
+      </div>
+    `;
+    body.appendChild(rewardBlock);
 
     const hr2 = document.createElement('hr');
     hr2.className = 'receipt-divider';
@@ -881,27 +992,29 @@ class PrinterApp {
 
     const thead = document.createElement('thead');
     thead.innerHTML = `
-      <tr style="border-bottom:1px solid #ccc;">
-        <th style="text-align:left; padding:2px 0; font-weight:700;">${L.product}</th>
-        <th style="text-align:center; font-weight:700;">${L.quantity}</th>
-        <th style="text-align:right; font-weight:700;">${L.reward}</th>
+      <tr style="background:#f0f9f0; border-bottom:1px solid #27ae60;">
+        <th style="text-align:left; padding:4px 3px; font-weight:700; color:#1a7a1a;">${L.product}</th>
+        <th style="text-align:center; font-weight:700; color:#1a7a1a;">${L.quantity}</th>
+        <th style="text-align:right; padding:4px 3px; font-weight:700; color:#1a7a1a;">${L.reward}</th>
       </tr>
     `;
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
-    const rows = [
-      [L.glass, glass, glass],
-      [L.plastic, plastic, plastic],
-      [L.metal, metal, metal],
-      [L.tetrapak, tetrapak, tetrapak],
+    const items = [
+      { icon: '🫙', name: L.glass,    qty: glass,    pts: glass },
+      { icon: '🧴', name: L.plastic,  qty: plastic,  pts: plastic },
+      { icon: '🥫', name: L.metal,    qty: metal,    pts: metal },
+      { icon: '🧃', name: L.tetrapak, qty: tetrapak, pts: tetrapak },
     ];
-    rows.forEach(([name, qty, pts]) => {
+    items.forEach(({ icon, name, qty, pts }, idx) => {
+      if (!qty && qty !== 0) return;
       const tr = document.createElement('tr');
+      tr.style.cssText = idx % 2 === 0 ? 'background:#fff;' : 'background:#f8fdf8;';
       tr.innerHTML = `
-        <td style="text-align:left; padding:2px 0;">${name}</td>
-        <td style="text-align:center;">${qty}</td>
-        <td style="text-align:right;">${pts}</td>
+        <td style="text-align:left; padding:4px 3px;">${icon} ${name}</td>
+        <td style="text-align:center; color:#333;">${qty}</td>
+        <td style="text-align:right; padding:4px 3px; font-weight:600; color:#27ae60;">${pts}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -921,14 +1034,14 @@ class PrinterApp {
       try {
         new QRCode(qrArea, {
           text: qrData,
-          width: 140,
-          height: 140,
+          width: 130,
+          height: 130,
           colorDark: '#000',
           colorLight: '#fff',
           correctLevel: QRCode.CorrectLevel.M,
         });
       } catch (e) {
-        qrArea.textContent = `[QR: ${qrData}]`;
+        qrArea.innerHTML = `<span style="font-size:10px;color:#666;">[QR: ${qrData}]</span>`;
       }
     }
 

@@ -97,6 +97,11 @@
       "done": "Done",
       "failed": "Failed",
       "info": "Info"
+    },
+    "filter": {
+      "all": "All",
+      "failed": "❌ Errors Only",
+      "done": "✅ Successful Only"
     }
   },
   "toast": {
@@ -124,5 +129,43 @@
     "version": "v1.0.0",
     "apiDocs": "API Documentation",
     "github": "GitHub"
+  },
+  "aco": {
+    "title": "ACO Recycling Reward Receipt",
+    "form_description": "Standard reward receipt for reverse vending machine — MachineID, reward, product table and QR code",
+    "machine_id": "Machine ID",
+    "reward_amount": "Reward Amount",
+    "currency": "Currency",
+    "products_heading": "Product Quantities",
+    "glass": "Glass",
+    "plastic": "Plastic",
+    "metal": "Metal",
+    "tetrapak": "Tetrapak",
+    "qr_label": "QR Code Data (URL)",
+    "template_label": "Template Name (optional)",
+    "template_default": "ACO Recycling Default Reward",
+    "print_button": "Print ACO Receipt"
+  },
+  "paper": {
+    "section_header": "PAPER STATUS",
+    "stats_title": "Paper Roll Estimate",
+    "reset_button": "I Loaded a New Roll",
+    "note": "All values are estimates — the printer does not report actual paper length.",
+    "total": "Total Roll",
+    "used": "Used",
+    "print_count": "Prints on This Roll",
+    "avg_per_print": "Avg per Print",
+    "remaining_m": "m left",
+    "remaining_pct": "remaining",
+    "prints_remaining": "prints remaining (est.)",
+    "print_count_unit": "prints",
+    "low_warning": "Paper running low",
+    "critical_warning": "Replace roll immediately!",
+    "reset_done": "New roll counter reset!",
+    "reset_error": "Could not reset roll"
+  },
+  "settings": {
+    "printerLang": "Printer Message Language",
+    "printerLangHint": "Language for error and success messages"
   }
 }

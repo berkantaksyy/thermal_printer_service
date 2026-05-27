@@ -49,14 +49,14 @@
           <input type="text" id="apiUrl" placeholder="http://localhost:8000">
         </div>
         <div class="form-group" style="flex: 0 0 auto; min-width: 140px;">
-          <label>🖨️ Yazıcı Mesaj Dili</label>
+          <label>🖨️ <span data-i18n="settings.printerLang">Yazıcı Mesaj Dili</span></label>
           <select id="printerLang" style="width: 100%;">
             <option value="tr">🇹🇷 Türkçe</option>
             <option value="en">🇬🇧 English</option>
             <option value="de">🇩🇪 Deutsch</option>
             <option value="fr">🇫🇷 Français</option>
           </select>
-          <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px;">
+          <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px;" data-i18n="settings.printerLangHint">
             Hata ve başarı mesajlarının dili
           </div>
         </div>
@@ -84,9 +84,25 @@
         <span data-i18n="status.memory">Bellek</span>:
         <strong id="memory">—</strong>
       </div>
+      <div class="status-item" id="paperStatusItem" title="Tahmini kağıt durumu">
+        <span>🗞️</span>
+        <span id="paperPct" style="font-weight:600;">—</span>
+        <div id="paperBar" style="width:60px; height:6px; background:var(--surface-secondary); border-radius:3px; overflow:hidden; display:inline-block; vertical-align:middle; margin-left:4px;">
+          <div id="paperBarFill" style="height:100%; width:100%; background:#22c55e; border-radius:3px; transition:width 0.4s, background 0.4s;"></div>
+        </div>
+      </div>
       <div class="status-spacer"></div>
       <button class="btn btn-sm btn-secondary" id="refreshStatusBtn">
         <span data-i18n="status.refresh">↻ Yenile</span>
+      </button>
+    </div>
+
+    <!-- Rulo Uyarı Bandı -->
+    <div id="paperWarningBanner" class="hidden" style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 16px; margin-bottom: 12px; display:flex; align-items:center; gap:10px; font-size:13px;">
+      <span style="font-size:18px;">⚠️</span>
+      <span id="paperWarningText" style="color:#b91c1c; font-weight:600;"></span>
+      <button class="btn btn-sm" id="paperResetBtnBanner" style="margin-left:auto; background:#16a34a; color:#fff; font-size:12px;">
+        🗞️ <span data-i18n="paper.reset_button">Yeni Rulo Taktım</span>
       </button>
     </div>
 
@@ -302,30 +318,30 @@
       <div class="card mt-lg" style="border-left: 4px solid #16a34a;">
         <div class="card-title" style="color: #16a34a;">
           <span>♻️</span>
-          <span>ACO Recycling Ödül Fişi</span>
+          <span data-i18n="aco.title">ACO Recycling Ödül Fişi</span>
         </div>
-        <p class="text-secondary mb-md" style="font-size: 13px;">
+        <p class="text-secondary mb-md" style="font-size: 13px;" data-i18n="aco.form_description">
           Geri dönüşüm makinesi için standart ödül fişi — MachineID, ödül, ürün tablosu ve QR kod
         </p>
 
         <div class="form-row">
           <div class="form-group">
-            <label>İş ID</label>
+            <label data-i18n="print.text.jobId">İş ID</label>
             <input type="text" id="acoJobId" placeholder="aco-001">
           </div>
           <div class="form-group">
-            <label>Makine ID</label>
+            <label data-i18n="aco.machine_id">Makine ID</label>
             <input type="text" id="acoMachineId" placeholder="ACO-TEST-0001-0001" value="ACO-TEST-0001-0001">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Ödül Miktarı</label>
+            <label data-i18n="aco.reward_amount">Ödül Miktarı</label>
             <input type="number" id="acoReward" value="3.00" min="0" step="0.01">
           </div>
           <div class="form-group">
-            <label>Para Birimi</label>
+            <label data-i18n="aco.currency">Para Birimi</label>
             <select id="acoCurrency">
               <option value="TL">₺ TL</option>
               <option value="EUR">€ EUR</option>
@@ -336,46 +352,46 @@
         </div>
 
         <div style="margin-bottom: 12px;">
-          <label style="font-size: 13px; font-weight: 600; margin-bottom: 8px; display: block;">Ürün Adetleri</label>
+          <label style="font-size: 13px; font-weight: 600; margin-bottom: 8px; display: block;" data-i18n="aco.products_heading">Ürün Adetleri</label>
           <div class="grid grid-2" style="gap: 8px;">
             <div class="form-group" style="margin-bottom: 0;">
-              <label>🫙 Cam</label>
+              <label>🫙 <span data-i18n="aco.glass">Cam</span></label>
               <input type="number" id="acoGlass" value="0" min="0">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label>🧴 Plastik</label>
+              <label>🧴 <span data-i18n="aco.plastic">Plastik</span></label>
               <input type="number" id="acoPlastic" value="0" min="0">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label>🥫 Metal</label>
+              <label>🥫 <span data-i18n="aco.metal">Metal</span></label>
               <input type="number" id="acoMetal" value="0" min="0">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label>📦 Tetrapak</label>
+              <label>📦 <span data-i18n="aco.tetrapak">Tetrapak</span></label>
               <input type="number" id="acoTetrapak" value="0" min="0">
             </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label>QR Kod Verisi (URL)</label>
+          <label data-i18n="aco.qr_label">QR Kod Verisi (URL)</label>
           <input type="text" id="acoQrData" placeholder="https://acorecycling.com/receipt/...">
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Şablon Adı (opsiyonel)</label>
-            <input type="text" id="acoTemplateName" placeholder="Aco Recycling Default Reward">
+            <label data-i18n="aco.template_label">Şablon Adı (opsiyonel)</label>
+            <input type="text" id="acoTemplateName" data-i18n="aco.template_default" placeholder="Aco Recycling Default Reward">
           </div>
           <label class="checkbox-label">
             <input type="checkbox" id="acoAutoCut" checked>
-            <span>Otomatik Kes</span>
+            <span data-i18n="print.text.autoCut">Otomatik Kes</span>
           </label>
         </div>
 
         <button class="btn mt-md" id="printAcoBtn" style="background: #16a34a; color: #fff; width: 100%;">
           <span>♻️</span>
-          <span>ACO Fişi Yazdır</span>
+          <span data-i18n="aco.print_button">ACO Fişi Yazdır</span>
         </button>
       </div>
 
@@ -428,6 +444,56 @@
 
     </section>
 
+    <!-- RULO DURUMU -->
+    <section class="section" id="paperSection">
+      <div class="section-header">🗞️ <span data-i18n="paper.section_header">RULO DURUMU</span></div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🗞️</span>
+            <span data-i18n="paper.stats_title">Kağıt Rulo Tahmini</span>
+          </div>
+          <button class="btn btn-sm" id="paperResetBtn" style="background:#16a34a; color:#fff;">
+            🗞️ <span data-i18n="paper.reset_button">Yeni Rulo Taktım</span>
+          </button>
+        </div>
+        <p class="text-secondary" style="font-size:12px; margin-bottom:12px;">
+          ⚠️ <span data-i18n="paper.note">Tüm değerler tahmindir — yazıcı gerçek kağıt uzunluğunu raporlamaz.</span>
+        </p>
+
+        <!-- Progress bar -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+            <span id="paperRemainingLabel" style="font-weight:600;">—</span>
+            <span id="paperPrintsLabel" class="text-secondary">—</span>
+          </div>
+          <div style="height:12px; background:var(--surface-secondary); border-radius:6px; overflow:hidden;">
+            <div id="paperProgressBar" style="height:100%; width:100%; background:#22c55e; border-radius:6px; transition: width 0.5s, background 0.5s;"></div>
+          </div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="grid grid-2" style="gap:8px; font-size:12px;">
+          <div style="background:var(--surface-secondary); padding:8px 12px; border-radius:6px;">
+            <div class="text-secondary">📏 <span data-i18n="paper.total">Toplam Rulo</span></div>
+            <div id="paperTotal" style="font-weight:600; margin-top:2px;">—</div>
+          </div>
+          <div style="background:var(--surface-secondary); padding:8px 12px; border-radius:6px;">
+            <div class="text-secondary">📊 <span data-i18n="paper.used">Kullanılan</span></div>
+            <div id="paperUsed" style="font-weight:600; margin-top:2px;">—</div>
+          </div>
+          <div style="background:var(--surface-secondary); padding:8px 12px; border-radius:6px;">
+            <div class="text-secondary">🖨️ <span data-i18n="paper.print_count">Bu Rulodaki Baskı</span></div>
+            <div id="paperPrintCount" style="font-weight:600; margin-top:2px;">—</div>
+          </div>
+          <div style="background:var(--surface-secondary); padding:8px 12px; border-radius:6px;">
+            <div class="text-secondary">📐 <span data-i18n="paper.avg_per_print">Baskı Başına Ort.</span></div>
+            <div id="paperAvg" style="font-weight:600; margin-top:2px;">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- BASKI ÖNİZLEME -->
     <section class="section" id="previewSection" style="display:none;">
       <div class="section-header">SON BASKI ÖNİZLEMESİ</div>
@@ -459,9 +525,9 @@
           <div class="flex gap-sm" style="align-items: center; flex-wrap: wrap;">
             <span id="logsTotalCount" style="font-size: 12px; color: var(--text-secondary);"></span>
             <select id="logFilterSelect" class="btn btn-sm btn-secondary" style="cursor:pointer; padding: 4px 8px;">
-              <option value="all">Tümü</option>
-              <option value="failed">❌ Sadece Hatalar</option>
-              <option value="done">✅ Sadece Başarılı</option>
+              <option value="all" data-i18n="logs.filter.all">Tümü</option>
+              <option value="failed" data-i18n="logs.filter.failed">❌ Sadece Hatalar</option>
+              <option value="done" data-i18n="logs.filter.done">✅ Sadece Başarılı</option>
             </select>
             <button class="btn btn-sm btn-secondary" id="refreshLogsBtn">
               <span>↻</span>

@@ -97,6 +97,11 @@
       "done": "Terminé",
       "failed": "Échoué",
       "info": "Info"
+    },
+    "filter": {
+      "all": "Tout",
+      "failed": "❌ Erreurs seulement",
+      "done": "✅ Réussites seulement"
     }
   },
   "toast": {
@@ -124,5 +129,43 @@
     "version": "v1.0.0",
     "apiDocs": "Documentation API",
     "github": "GitHub"
+  },
+  "aco": {
+    "title": "Reçu de récompense ACO Recycling",
+    "form_description": "Reçu de récompense standard pour distributeur automatique — ID machine, récompense, tableau produits et code QR",
+    "machine_id": "ID Machine",
+    "reward_amount": "Montant de la récompense",
+    "currency": "Devise",
+    "products_heading": "Quantités de produits",
+    "glass": "Verre",
+    "plastic": "Plastique",
+    "metal": "Métal",
+    "tetrapak": "Tetrapak",
+    "qr_label": "Données code QR (URL)",
+    "template_label": "Nom du modèle (optionnel)",
+    "template_default": "ACO Recycling Récompense Défaut",
+    "print_button": "Imprimer reçu ACO"
+  },
+  "paper": {
+    "section_header": "ÉTAT DU ROULEAU",
+    "stats_title": "Estimation du rouleau",
+    "reset_button": "J'ai chargé un nouveau rouleau",
+    "note": "Toutes les valeurs sont des estimations — l'imprimante ne signale pas la longueur réelle du papier.",
+    "total": "Rouleau total",
+    "used": "Utilisé",
+    "print_count": "Impressions sur ce rouleau",
+    "avg_per_print": "Moy. par impression",
+    "remaining_m": "m restant",
+    "remaining_pct": "restant",
+    "prints_remaining": "impressions restantes (est.)",
+    "print_count_unit": "impressions",
+    "low_warning": "Papier presque épuisé",
+    "critical_warning": "Remplacez le rouleau immédiatement !",
+    "reset_done": "Nouveau compteur de rouleau réinitialisé !",
+    "reset_error": "Impossible de réinitialiser le rouleau"
+  },
+  "settings": {
+    "printerLang": "Langue des messages imprimante",
+    "printerLangHint": "Langue pour les messages d'erreur et de succès"
   }
 }

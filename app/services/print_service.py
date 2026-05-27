@@ -5,7 +5,6 @@ Print service — orchestrates job execution, idempotency, and error recovery.
 import asyncio
 import base64
 import logging
-import time
 from datetime import datetime, timezone
 from typing import Optional, Any
 
@@ -18,12 +17,9 @@ from app.services.log_service import get_log_service
 from app.services.queue_service import get_queue_service, JobRecord
 from app.services.llm_service import get_llm_service
 from app.services.i18n_service import get_i18n_service
+from app.services.paper_service import get_paper_service
 
 logger = logging.getLogger(__name__)
-
-
-def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
 
 
 def _check_printer_status(status: dict, language: Optional[str] = None) -> None:
@@ -147,13 +143,18 @@ class PrintService:
         llm = get_llm_service()
 
         lang = req.language or "en"
-        lines = await llm.generate_receipt_lines(req.data, language=lang, template_hint=req.template_hint)
 
         rec = await queue.enqueue(
             op="print_smart",
-            payload={"data": req.data, "language": lang},
+            payload={"data": req.data, "language": lang, "cut": req.cut},
             job_id=req.job_id,
         )
+        if rec.is_duplicate:
+            return JobResponse(job_id=rec.job_id, status="done",
+                               message="Duplicate job — already processed.",
+                               timestamp=datetime.now(timezone.utc))
+
+        lines = await llm.generate_receipt_lines(req.data, language=lang, template_hint=req.template_hint)
         return await self._execute(
             rec=rec,
             printer=printer,
@@ -273,6 +274,7 @@ class PrintService:
             _check_printer_status(post_status, lang)
 
             await log.log(op=rec.op, status="done", conn=conn, job_id=rec.job_id)
+            get_paper_service().record_print(rec.op, rec.payload)
             return JobResponse(
                 job_id=rec.job_id,
                 status="done",
@@ -306,10 +308,10 @@ class PrintService:
                 + (escpos.feed_lines(3) + escpos.cut() if payload.get("cut", True) else b"")
             )
         elif op == "print_smart":
-            # Fallback: plain text dump of data
-            lines = [{"text": f"{k}: {v}", "bold": False, "align": "left", "font_size": "normal"}
-                     for k, v in payload.get("data", {}).items()]
-            return escpos.build_receipt(lines)
+            lang = payload.get("language", "en")
+            llm = get_llm_service()
+            lines = llm._fallback_format(payload.get("data", {}), language=lang)
+            return escpos.build_receipt(lines, cut=payload.get("cut", True))
         else:
             return b""
 
