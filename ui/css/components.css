@@ -3,6 +3,140 @@
  */
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   TERMİK YAZICI ÖNİZLEME
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.receipt-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-lg) 0;
+}
+
+.receipt-paper {
+  background: #fff;
+  color: #111;
+  width: 280px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.22);
+  border-radius: 2px;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+/* Torn top edge */
+.receipt-paper::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 14px;
+  background: linear-gradient(135deg,
+    #fff 25%, transparent 25%) -8px 0,
+    linear-gradient(225deg, #fff 25%, transparent 25%) -8px 0,
+    linear-gradient(315deg, #fff 25%, transparent 25%),
+    linear-gradient(45deg,  #fff 25%, transparent 25%);
+  background-size: 16px 14px;
+  background-color: var(--surface-secondary);
+}
+
+/* Torn bottom edge */
+.receipt-paper::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 14px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, transparent 25%, #fff 25%) -8px 0,
+    linear-gradient(225deg, transparent 25%, #fff 25%) -8px 0,
+    linear-gradient(315deg, transparent 25%, #fff 25%),
+    linear-gradient(45deg, transparent 25%, #fff 25%);
+  background-size: 16px 14px;
+  background-color: var(--surface-secondary);
+}
+
+.receipt-body {
+  padding: 8px 18px 4px 18px;
+}
+
+.receipt-line {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.receipt-line.align-center { text-align: center; }
+.receipt-line.align-right  { text-align: right; }
+.receipt-line.align-left   { text-align: left; }
+
+.receipt-line.bold       { font-weight: 700; }
+.receipt-line.underline  { text-decoration: underline; }
+.receipt-line.font-double {
+  font-size: 18px;
+  line-height: 1.4;
+}
+.receipt-line.font-double_height {
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0;
+  transform: scaleY(1.6);
+  display: inline-block;
+  width: 100%;
+}
+.receipt-line.font-double_width {
+  letter-spacing: 3px;
+}
+
+.receipt-divider {
+  border: none;
+  border-top: 1px dashed #bbb;
+  margin: 6px 0;
+}
+
+.receipt-qr-area {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.receipt-qr-area canvas {
+  display: inline-block;
+}
+
+.receipt-qr-label {
+  font-size: 11px;
+  color: #444;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.receipt-image-area {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.receipt-image-area img {
+  max-width: 240px;
+  image-rendering: pixelated;
+  filter: grayscale(1) contrast(1.3);
+}
+
+.receipt-timestamp {
+  font-size: 10px;
+  color: #777;
+  text-align: center;
+  margin-top: 6px;
+}
+
+.receipt-meta {
+  font-size: 10px;
+  color: #555;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
    BUTONLAR
    ═══════════════════════════════════════════════════════════════════════════ */
 

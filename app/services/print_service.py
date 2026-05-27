@@ -160,10 +160,13 @@ class PrintService:
             data=escpos.build_receipt(lines, cut=req.cut),
             log=log,
             conn=printer.connection_type(),
+            language=req.language,
         )
 
-    async def reprint(self, job_id: str) -> JobResponse:
+    async def reprint(self, job_id: str, language: Optional[str] = None) -> JobResponse:
         """Retry a previously failed job."""
+        i18n = get_i18n_service()
+        lang = language or "tr"
         queue = get_queue_service()
         log = get_log_service()
         printer = require_printer()
@@ -172,7 +175,7 @@ class PrintService:
         if rec is None:
             raise PrinterError(
                 PrinterErrorCode.UNKNOWN_COMMAND,
-                f"Job ID '{job_id}' not found in failed queue.",
+                i18n.t("print.reprint_not_found", lang=lang),
                 job_id=job_id,
             )
 
@@ -184,6 +187,7 @@ class PrintService:
             data=data,
             log=log,
             conn=printer.connection_type(),
+            language=language,
         )
         if result.status == "done":
             await queue.delete_failed(job_id)
@@ -196,11 +200,15 @@ class PrintService:
         data: bytes,
         log: Any,
         conn: str,
+        language: Optional[str] = None,
     ) -> JobResponse:
+        i18n = get_i18n_service()
+        lang = language or "tr"
+
         try:
             # ── Pre-flight: yazdırmadan önce yazıcı durumunu kontrol et ──────
             pre_status = await printer.get_status()
-            _check_printer_status(pre_status)
+            _check_printer_status(pre_status, lang)
 
             # ── Veriyi gönder ─────────────────────────────────────────────────
             await printer.write(data)
@@ -208,13 +216,13 @@ class PrintService:
             # ── Post-print: yazıcının işlemi bitirmesi için kısa bekle ────────
             await asyncio.sleep(0.2)
             post_status = await printer.get_status()
-            _check_printer_status(post_status)
+            _check_printer_status(post_status, lang)
 
             await log.log(op=rec.op, status="done", conn=conn, job_id=rec.job_id)
             return JobResponse(
                 job_id=rec.job_id,
                 status="done",
-                message="Print job completed.",
+                message=i18n.t("print.done", lang=lang),
                 timestamp=datetime.now(timezone.utc),
             )
         except PrinterError as err:

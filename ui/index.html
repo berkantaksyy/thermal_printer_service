@@ -48,6 +48,18 @@
           <label>🌐 API URL</label>
           <input type="text" id="apiUrl" placeholder="http://localhost:8000">
         </div>
+        <div class="form-group" style="flex: 0 0 auto; min-width: 140px;">
+          <label>🖨️ Yazıcı Mesaj Dili</label>
+          <select id="printerLang" style="width: 100%;">
+            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="fr">🇫🇷 Français</option>
+          </select>
+          <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px;">
+            Hata ve başarı mesajlarının dili
+          </div>
+        </div>
       </div>
     </div>
 
@@ -335,6 +347,24 @@
 
     </section>
 
+    <!-- BASKI ÖNİZLEME -->
+    <section class="section" id="previewSection" style="display:none;">
+      <div class="section-header">SON BASKI ÖNİZLEMESİ</div>
+      <div class="card" style="text-align: center;">
+        <p class="text-secondary mb-md" style="font-size: 13px;">
+          Son yazdırma işleminin yazıcıdan nasıl çıkacağının tahmini önizlemesi
+        </p>
+        <div class="receipt-wrapper">
+          <div class="receipt-paper">
+            <div class="receipt-body" id="receiptBody">
+              <!-- JS tarafından doldurulur -->
+            </div>
+          </div>
+        </div>
+        <div id="receiptMeta" style="font-size: 11px; color: var(--text-tertiary); margin-top: 8px;"></div>
+      </div>
+    </section>
+
     <!-- LOGLAR -->
     <section class="section">
       <div class="section-header" data-i18n="logs.title">LOGLAR</div>
@@ -396,6 +426,9 @@
       <a href="https://github.com" style="color: var(--accent-primary); text-decoration: none;" data-i18n="footer.github">GitHub</a>
     </p>
   </footer>
+
+  <!-- QR Code library for receipt preview -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <!-- JavaScript -->
   <script src="/ui/js/i18n.js"></script>

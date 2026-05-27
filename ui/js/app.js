@@ -38,12 +38,25 @@ class PrinterApp {
    * Event listener'ları kur
    */
   setupEventListeners() {
-    // Dil değiştirme
+    // Dil değiştirme (UI dili)
     document.querySelectorAll('.lang-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         i18n.setLanguage(btn.dataset.lang);
+        // UI dili değişince yazıcı dili de otomatik senkronize et (kullanıcı elle değiştirmediyse)
+        const printerLangEl = document.getElementById('printerLang');
+        if (printerLangEl && !printerLangEl.dataset.manuallySet) {
+          printerLangEl.value = btn.dataset.lang;
+        }
       });
     });
+
+    // Yazıcı mesaj dili değiştirilirse manuel olarak ayarlandığını işaretle
+    const printerLangEl = document.getElementById('printerLang');
+    if (printerLangEl) {
+      printerLangEl.addEventListener('change', () => {
+        printerLangEl.dataset.manuallySet = 'true';
+      });
+    }
 
     // API ayarları
     const apiUrlInput = document.getElementById('apiUrl');
@@ -268,6 +281,18 @@ class PrinterApp {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // PRINT HELPERS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Yazıcı mesaj dilini döndür (hata/başarı mesajları için)
+   * Kullanıcının üst ayar panelindeki seçimi; yoksa UI diline düşer.
+   */
+  getPrinterLanguage() {
+    return document.getElementById('printerLang')?.value || i18n.getCurrentLanguage();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // PRINT - TEXT
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -304,17 +329,20 @@ class PrinterApp {
       const data = {
         lines,
         cut: autoCut,
-        language: i18n.getCurrentLanguage()
+        language: this.getPrinterLanguage()
       };
 
       if (jobId) data.job_id = jobId;
 
       const result = await api.printText(data);
       ui.success(`✅ ${result.message} (${result.job_id})`);
-      
+
+      // Önizlemeyi göster
+      this.showReceiptPreview('text', { lines, jobId: result.job_id });
+
       // Formu temizle
       document.getElementById('textContent').value = '';
-      
+
       // Logları yenile
       setTimeout(() => this.loadLogs(), 1000);
 
@@ -356,7 +384,7 @@ class PrinterApp {
         error_correction: errorCorrection,
         align,
         cut: autoCut,
-        language: i18n.getCurrentLanguage()
+        language: this.getPrinterLanguage()
       };
 
       if (jobId) data.job_id = jobId;
@@ -364,13 +392,16 @@ class PrinterApp {
 
       const result = await api.printQR(data);
       ui.success(`✅ ${result.message} (${result.job_id})`);
-      
+
+      // Önizlemeyi göster
+      this.showReceiptPreview('qr', { qrData, label, align, size, jobId: result.job_id });
+
       // Formu temizle
       document.getElementById('qrData').value = '';
       if (document.getElementById('qrLabel')) {
         document.getElementById('qrLabel').value = '';
       }
-      
+
       setTimeout(() => this.loadLogs(), 1000);
 
     } catch (error) {
@@ -432,15 +463,19 @@ class PrinterApp {
         image_base64: base64,
         align,
         cut: autoCut,
-        language: i18n.getCurrentLanguage()
+        language: this.getPrinterLanguage()
       };
 
       if (jobId) data.job_id = jobId;
 
       const result = await api.printImage(data);
       ui.success(`✅ ${result.message} (${result.job_id})`);
-      
-      // Önizlemeyi temizle
+
+      // Baskı önizlemesini göster
+      const uploadedPreviewSrc = document.getElementById('imagePreview')?.src;
+      this.showReceiptPreview('image', { src: uploadedPreviewSrc, align, jobId: result.job_id });
+
+      // Yükleme önizlemesini temizle
       const preview = document.getElementById('imagePreview');
       if (preview) {
         preview.src = '';
@@ -503,7 +538,10 @@ class PrinterApp {
 
       const result = await api.printSmart(data);
       ui.success(`🤖 ${result.message} (${result.job_id})`);
-      
+
+      // Önizlemeyi göster
+      this.showReceiptPreview('smart', { data: JSON.parse(jsonData), hint, jobId: result.job_id });
+
       setTimeout(() => this.loadLogs(), 1000);
 
     } catch (error) {
@@ -511,6 +549,191 @@ class PrinterApp {
     } finally {
       ui.setButtonLoading(btn, false);
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RECEIPT PREVIEW
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Baskı önizlemesini göster
+   * @param {'text'|'qr'|'image'|'smart'} type
+   * @param {object} data
+   */
+  showReceiptPreview(type, data) {
+    const section = document.getElementById('previewSection');
+    const body = document.getElementById('receiptBody');
+    const meta = document.getElementById('receiptMeta');
+    if (!section || !body) return;
+
+    // Scroll to preview
+    section.style.display = '';
+    body.innerHTML = '';
+
+    const now = new Date().toLocaleString('tr-TR');
+
+    if (type === 'text') {
+      const { lines = [], jobId } = data;
+      lines.forEach((line, idx) => {
+        const span = document.createElement('span');
+        span.className = [
+          'receipt-line',
+          `align-${line.align || 'left'}`,
+          line.bold ? 'bold' : '',
+          line.underline ? 'underline' : '',
+          line.font_size === 'double' || line.font_size === 'double_height' || line.font_size === 'double_width'
+            ? `font-${line.font_size}` : '',
+        ].filter(Boolean).join(' ');
+        span.textContent = line.text || '';
+        body.appendChild(span);
+
+        // Satır arası boşluk
+        if (idx < lines.length - 1) {
+          body.appendChild(document.createElement('br'));
+        }
+      });
+
+      // Kesme çizgisi taklidi
+      const hr = document.createElement('hr');
+      hr.className = 'receipt-divider';
+      body.appendChild(hr);
+
+      // Zaman damgası
+      const ts = document.createElement('div');
+      ts.className = 'receipt-timestamp';
+      ts.textContent = now;
+      body.appendChild(ts);
+
+      if (meta) meta.textContent = `İş ID: ${jobId || '—'}`;
+
+    } else if (type === 'qr') {
+      const { qrData, label, align = 'center', size = 6, jobId } = data;
+
+      const header = document.createElement('div');
+      header.className = 'receipt-line align-center bold';
+      header.textContent = '[ QR KOD ]';
+      body.appendChild(header);
+
+      const hr1 = document.createElement('hr');
+      hr1.className = 'receipt-divider';
+      body.appendChild(hr1);
+
+      // QR render area
+      const qrArea = document.createElement('div');
+      qrArea.className = 'receipt-qr-area';
+      body.appendChild(qrArea);
+
+      // Render QR using qrcodejs if available
+      const qrSize = Math.min(Math.max(size * 14, 80), 200);
+      if (window.QRCode) {
+        try {
+          new QRCode(qrArea, {
+            text: qrData || ' ',
+            width: qrSize,
+            height: qrSize,
+            colorDark: '#000',
+            colorLight: '#fff',
+            correctLevel: QRCode.CorrectLevel.M,
+          });
+        } catch (e) {
+          qrArea.textContent = qrData;
+        }
+      } else {
+        // Fallback: just show the text
+        qrArea.style.wordBreak = 'break-all';
+        qrArea.style.fontSize = '10px';
+        qrArea.textContent = `[QR: ${qrData}]`;
+      }
+
+      if (label) {
+        const lbl = document.createElement('div');
+        lbl.className = 'receipt-qr-label';
+        lbl.textContent = label;
+        body.appendChild(lbl);
+      }
+
+      const hr2 = document.createElement('hr');
+      hr2.className = 'receipt-divider';
+      body.appendChild(hr2);
+
+      const ts = document.createElement('div');
+      ts.className = 'receipt-timestamp';
+      ts.textContent = now;
+      body.appendChild(ts);
+
+      if (meta) meta.textContent = `İş ID: ${jobId || '—'}  |  Boyut: ${size}  |  Hizalama: ${align}`;
+
+    } else if (type === 'image') {
+      const { src, align = 'center', jobId } = data;
+
+      const imgArea = document.createElement('div');
+      imgArea.className = 'receipt-image-area';
+      if (src) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.textAlign = align;
+        imgArea.appendChild(img);
+      } else {
+        imgArea.textContent = '[Görsel]';
+      }
+      body.appendChild(imgArea);
+
+      const hr = document.createElement('hr');
+      hr.className = 'receipt-divider';
+      body.appendChild(hr);
+
+      const ts = document.createElement('div');
+      ts.className = 'receipt-timestamp';
+      ts.textContent = now;
+      body.appendChild(ts);
+
+      if (meta) meta.textContent = `İş ID: ${jobId || '—'}  |  Hizalama: ${align}`;
+
+    } else if (type === 'smart') {
+      const { data: jsonData = {}, hint, jobId } = data;
+
+      const header = document.createElement('div');
+      header.className = 'receipt-line align-center bold font-double';
+      header.textContent = hint ? hint.toUpperCase() : 'AKILLI FİŞ';
+      body.appendChild(header);
+
+      const hr1 = document.createElement('hr');
+      hr1.className = 'receipt-divider';
+      body.appendChild(hr1);
+
+      Object.entries(jsonData).forEach(([key, val]) => {
+        const row = document.createElement('span');
+        row.className = 'receipt-line align-left';
+        const keyStr = key.replace(/_/g, ' ').toUpperCase();
+        const valStr = String(val);
+        // Pad key and value like a receipt
+        const padded = keyStr.padEnd(14, ' ') + valStr;
+        row.textContent = padded;
+        body.appendChild(row);
+        body.appendChild(document.createElement('br'));
+      });
+
+      const hr2 = document.createElement('hr');
+      hr2.className = 'receipt-divider';
+      body.appendChild(hr2);
+
+      const aiNote = document.createElement('div');
+      aiNote.className = 'receipt-meta';
+      aiNote.textContent = '🤖 AI tarafından formatlandı';
+      body.appendChild(aiNote);
+
+      const ts = document.createElement('div');
+      ts.className = 'receipt-timestamp';
+      ts.textContent = now;
+      body.appendChild(ts);
+
+      if (meta) meta.textContent = `İş ID: ${jobId || '—'}`;
+    }
+
+    // Smooth scroll to preview
+    setTimeout(() => {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

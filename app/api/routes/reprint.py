@@ -107,6 +107,6 @@ Yeniden yazdırma başarılı olursa, iş otomatik olarak başarısız kuyruktan
 async def reprint(req: ReprintRequest):
     """Başarısız işi yeniden yazdır"""
     try:
-        return await get_print_service().reprint(req.job_id)
+        return await get_print_service().reprint(req.job_id, language=req.language)
     except PrinterError as err:
         raise printer_error_to_http(err)
