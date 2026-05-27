@@ -76,20 +76,6 @@ class API {
     }
   }
 
-  /**
-   * GET kısayol metodu
-   */
-  async get(endpoint) {
-    return this.request('GET', endpoint);
-  }
-
-  /**
-   * POST kısayol metodu
-   */
-  async post(endpoint, body = null) {
-    return this.request('POST', endpoint, body);
-  }
-
   // ═══════════════════════════════════════════════════════════════════════════
   // HEALTH & STATUS
   // ═══════════════════════════════════════════════════════════════════════════
