@@ -30,5 +30,19 @@
     "disabled": "LLM feature is disabled. Set LLM_ENABLED=true in .env to enable.",
     "error": "LLM request failed.",
     "no_api_key": "OpenRouter API key not configured."
+  },
+  "aco": {
+    "subtitle": "reverse vending recycling systems",
+    "machine_id": "MachineID",
+    "reward": "Reward",
+    "product": "Product",
+    "quantity": "Quantity",
+    "reward_col": "Reward",
+    "glass": "Glass",
+    "plastic": "Plastic",
+    "metal": "Metal",
+    "tetrapak": "Tetrapak",
+    "template_default": "Aco Recycling Default Reward",
+    "done": "ACO receipt printed successfully."
   }
 }

@@ -298,6 +298,87 @@
         </button>
       </div>
 
+      <!-- ACO Recycling -->
+      <div class="card mt-lg" style="border-left: 4px solid #16a34a;">
+        <div class="card-title" style="color: #16a34a;">
+          <span>♻️</span>
+          <span>ACO Recycling Ödül Fişi</span>
+        </div>
+        <p class="text-secondary mb-md" style="font-size: 13px;">
+          Geri dönüşüm makinesi için standart ödül fişi — MachineID, ödül, ürün tablosu ve QR kod
+        </p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>İş ID</label>
+            <input type="text" id="acoJobId" placeholder="aco-001">
+          </div>
+          <div class="form-group">
+            <label>Makine ID</label>
+            <input type="text" id="acoMachineId" placeholder="ACO-TEST-0001-0001" value="ACO-TEST-0001-0001">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ödül Miktarı</label>
+            <input type="number" id="acoReward" value="3.00" min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Para Birimi</label>
+            <select id="acoCurrency">
+              <option value="TL">₺ TL</option>
+              <option value="EUR">€ EUR</option>
+              <option value="USD">$ USD</option>
+              <option value="GBP">£ GBP</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 13px; font-weight: 600; margin-bottom: 8px; display: block;">Ürün Adetleri</label>
+          <div class="grid grid-2" style="gap: 8px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>🫙 Cam</label>
+              <input type="number" id="acoGlass" value="0" min="0">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>🧴 Plastik</label>
+              <input type="number" id="acoPlastic" value="0" min="0">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>🥫 Metal</label>
+              <input type="number" id="acoMetal" value="0" min="0">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>📦 Tetrapak</label>
+              <input type="number" id="acoTetrapak" value="0" min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>QR Kod Verisi (URL)</label>
+          <input type="text" id="acoQrData" placeholder="https://acorecycling.com/receipt/...">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Şablon Adı (opsiyonel)</label>
+            <input type="text" id="acoTemplateName" placeholder="Aco Recycling Default Reward">
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" id="acoAutoCut" checked>
+            <span>Otomatik Kes</span>
+          </label>
+        </div>
+
+        <button class="btn mt-md" id="printAcoBtn" style="background: #16a34a; color: #fff; width: 100%;">
+          <span>♻️</span>
+          <span>ACO Fişi Yazdır</span>
+        </button>
+      </div>
+
       <!-- AI -->
       <div class="card mt-lg" style="border-left: 4px solid var(--warning);">
         <div class="card-title" style="color: var(--warning);">

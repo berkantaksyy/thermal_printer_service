@@ -69,13 +69,13 @@ class QueueService:
         return str(uuid.uuid4())
 
     async def enqueue(self, op: str, payload: dict, job_id: Optional[str] = None) -> JobRecord:
-        """Add job to queue. Returns existing record if job_id already seen (idempotency)."""
+        """Kuyruğa iş ekle. job_id daha önce görüldüyse mevcut kaydı döndür (idempotency)."""
         if job_id is None:
             job_id = self.generate_job_id()
 
         async with self._lock:
             if job_id in self._seen_ids:
-                # Idempotent: return duplicate marker — caller should skip execution
+                # Idempotent: tekrar işaretçisi döndür — çağıran yürütmeyi atlamalı
                 rec = JobRecord(job_id=job_id, op=op, payload=payload)
                 rec.is_duplicate = True
                 return rec
@@ -86,7 +86,7 @@ class QueueService:
         return rec
 
     async def get_next(self, timeout: float = 0.1) -> Optional[JobRecord]:
-        """Dequeue next job (non-blocking with timeout)."""
+        """Sıradaki işi kuyruktan çıkar (zaman aşımı ile bloklamayan)."""
         try:
             return await asyncio.wait_for(self._pending.get(), timeout=timeout)
         except asyncio.TimeoutError:
@@ -95,21 +95,21 @@ class QueueService:
     def queue_size(self) -> int:
         return self._pending.qsize()
 
-    # ── Failed job persistence ─────────────────────────────────────────────
+    # ── Başarısız iş kalıcılığı ─────────────────────────────────────────────
 
     async def save_failed(self, rec: JobRecord, error: str) -> None:
-        """Persist a failed job to disk for later reprint."""
+        """Başarısız işi daha sonra yeniden yazdırmak için diske kaydet."""
         rec.last_error = error
         rec.attempts += 1
         path = FAILED_JOBS_DIR / f"{rec.job_id}.json"
         try:
             path.write_text(json.dumps(rec.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8")
-            logger.info(f"Failed job saved: {rec.job_id}")
+            logger.info(f"Başarısız iş kaydedildi: {rec.job_id}")
         except Exception as exc:
-            logger.warning(f"Could not persist failed job {rec.job_id}: {exc}")
+            logger.warning(f"Başarısız iş {rec.job_id} kalıcı hale getirilemedi: {exc}")
 
     async def get_failed(self, job_id: str) -> Optional[JobRecord]:
-        """Load a failed job by ID."""
+        """ID'ye göre başarısız işi yükle."""
         path = FAILED_JOBS_DIR / f"{job_id}.json"
         if not path.exists():
             return None
@@ -117,11 +117,11 @@ class QueueService:
             data = json.loads(path.read_text(encoding="utf-8"))
             return JobRecord.from_dict(data)
         except Exception as exc:
-            logger.warning(f"Could not load failed job {job_id}: {exc}")
+            logger.warning(f"Başarısız iş {job_id} yüklenemedi: {exc}")
             return None
 
     async def delete_failed(self, job_id: str) -> bool:
-        """Remove a failed job record (call after successful reprint)."""
+        """Başarısız iş kaydını kaldır (başarılı yeniden yazdırmadan sonra çağır)."""
         path = FAILED_JOBS_DIR / f"{job_id}.json"
         if path.exists():
             path.unlink()
@@ -129,7 +129,7 @@ class QueueService:
         return False
 
     async def list_failed(self) -> list[dict]:
-        """List all failed jobs."""
+        """Tüm başarısız işleri listele."""
         results = []
         for f in sorted(FAILED_JOBS_DIR.glob("*.json")):
             try:
@@ -139,7 +139,7 @@ class QueueService:
         return results
 
 
-# Module-level singleton
+# Modül seviyesi singleton
 _queue_service: Optional[QueueService] = None
 
 

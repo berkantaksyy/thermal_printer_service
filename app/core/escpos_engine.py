@@ -224,6 +224,107 @@ class EscPosEngine:
         """Feed n blank lines (for paper margin before cut)."""
         return ESC + b"d" + bytes([n])
 
+    def build_aco_receipt(
+        self,
+        machine_id: str,
+        reward: float,
+        currency: str,
+        glass: int,
+        plastic: int,
+        metal: int,
+        tetrapak: int,
+        qr_data: str,
+        template_name: str,
+        language: str = "en",
+        cut: bool = True,
+    ) -> bytes:
+        """
+        Build a complete ACO Recycling reward receipt.
+
+        Layout:
+          ACO RECYCLING  (double font, bold, center)
+          reverse vending recycling systems  (normal, center)
+          <blank>
+          MachineID: <machine_id>  (bold, center)
+          <datetime UTC>  (center)
+          <template_name>  (normal, center)
+          <blank>
+          Reward: X.XX <symbol>  (double font, bold, center)
+          <blank>
+          ---- table (Product | Quantity | Reward) ----
+          <blank>
+          [QR code centered]
+          [feed + cut]
+        """
+        from datetime import datetime, timezone
+
+        # i18n labels (lazy import to avoid circular deps)
+        from app.services.i18n_service import get_i18n_service
+        i18n = get_i18n_service()
+        t = lambda key: i18n.t(f"aco.{key}", lang=language)
+
+        CURRENCY_SYMBOLS = {"TL": "₺", "EUR": "€", "USD": "$", "GBP": "£"}
+        sym = CURRENCY_SYMBOLS.get(currency.upper(), currency)
+
+        # Table geometry (42-char wide, normal font)
+        TABLE_W = 42
+        C1, C2, C3 = 14, 16, 12  # product | quantity | reward
+
+        def _divider() -> bytes:
+            return self.text_line("-" * TABLE_W, align="left")
+
+        def _header_row() -> bytes:
+            h = t("product")[:C1].ljust(C1) + t("quantity").center(C2) + t("reward_col").rjust(C3)
+            return self.text_line(h, bold=True, underline=True, align="left")
+
+        def _data_row(name: str, qty: int, pts: int) -> bytes:
+            row = name[:C1].ljust(C1) + str(qty).center(C2) + str(pts).rjust(C3)
+            return self.text_line(row, align="left")
+
+        now_str = datetime.now(timezone.utc).strftime("%d %B %Y %H:%M:%S UTC")
+        reward_str = f"{t('reward')}: {reward:.2f} {sym}"
+
+        buf = bytearray()
+        buf += self.init()
+
+        # ── Header ────────────────────────────────────────────────────────────
+        buf += self.text_line("ACO RECYCLING", bold=True, align="center", font_size="double")
+        buf += self.text_line(t("subtitle"), align="center")
+        buf += CMD_LF
+
+        # ── Machine info ──────────────────────────────────────────────────────
+        buf += self.text_line(f"{t('machine_id')}: {machine_id}", bold=True, align="center")
+        buf += self.text_line(now_str, align="center")
+        buf += self.text_line(template_name, align="center")
+        buf += CMD_LF
+
+        # ── Reward amount ─────────────────────────────────────────────────────
+        buf += self.text_line(reward_str, bold=True, align="center", font_size="double")
+        buf += CMD_LF
+
+        # ── Product table ─────────────────────────────────────────────────────
+        buf += _divider()
+        buf += _header_row()
+        buf += _divider()
+        buf += _data_row(t("glass"),    glass,    glass)
+        buf += _data_row(t("plastic"),  plastic,  plastic)
+        buf += _data_row(t("metal"),    metal,    metal)
+        buf += _data_row(t("tetrapak"), tetrapak, tetrapak)
+        buf += _divider()
+        buf += CMD_LF
+
+        # ── QR code ───────────────────────────────────────────────────────────
+        if qr_data:
+            buf += self.qr_code(data=qr_data, size=8, error_correction="M", align="center")
+            buf += CMD_LF
+
+        # ── Cut ───────────────────────────────────────────────────────────────
+        if cut:
+            buf += self.feed_lines(3)
+            buf += self.cut()
+
+        return bytes(buf)
+
     def build_receipt(
         self,
         lines: list[dict],

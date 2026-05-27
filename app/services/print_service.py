@@ -12,7 +12,7 @@ from typing import Optional, Any
 from app.core.escpos_engine import engine as escpos
 from app.core.printer import require_printer
 from app.core.error_handler import PrinterError, PrinterErrorCode
-from app.models.requests import PrintTextRequest, PrintImageRequest, PrintQRRequest, SmartPrintRequest
+from app.models.requests import PrintTextRequest, PrintImageRequest, PrintQRRequest, SmartPrintRequest, AcoReceiptRequest
 from app.models.responses import JobResponse
 from app.services.log_service import get_log_service
 from app.services.queue_service import get_queue_service, JobRecord
@@ -158,6 +158,60 @@ class PrintService:
             rec=rec,
             printer=printer,
             data=escpos.build_receipt(lines, cut=req.cut),
+            log=log,
+            conn=printer.connection_type(),
+            language=req.language,
+        )
+
+    async def print_aco(self, req: AcoReceiptRequest) -> JobResponse:
+        """Print an ACO Recycling reward receipt."""
+        queue = get_queue_service()
+        log = get_log_service()
+        printer = require_printer()
+
+        lang = req.language or "en"
+        i18n = get_i18n_service()
+        template = req.template_name or i18n.t("aco.template_default", lang=lang)
+
+        rec = await queue.enqueue(
+            op="print_aco",
+            payload={
+                "machine_id": req.machine_id,
+                "reward": req.reward,
+                "currency": req.currency,
+                "glass": req.glass,
+                "plastic": req.plastic,
+                "metal": req.metal,
+                "tetrapak": req.tetrapak,
+                "qr_data": req.qr_data,
+                "template_name": template,
+                "language": lang,
+                "cut": req.cut,
+            },
+            job_id=req.job_id,
+        )
+        if rec.is_duplicate:
+            return JobResponse(job_id=rec.job_id, status="done",
+                               message="Duplicate job — already processed.",
+                               timestamp=datetime.now(timezone.utc))
+
+        data = escpos.build_aco_receipt(
+            machine_id=req.machine_id,
+            reward=req.reward,
+            currency=req.currency,
+            glass=req.glass,
+            plastic=req.plastic,
+            metal=req.metal,
+            tetrapak=req.tetrapak,
+            qr_data=req.qr_data,
+            template_name=template,
+            language=lang,
+            cut=req.cut,
+        )
+        return await self._execute(
+            rec=rec,
+            printer=printer,
+            data=data,
             log=log,
             conn=printer.connection_type(),
             language=req.language,

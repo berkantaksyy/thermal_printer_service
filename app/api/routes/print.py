@@ -11,6 +11,7 @@ from app.models.requests import (
     PrintImageRequest,
     PrintQRRequest,
     SmartPrintRequest,
+    AcoReceiptRequest,
 )
 from app.models.responses import JobResponse
 from app.services.print_service import get_print_service
@@ -301,5 +302,52 @@ async def print_smart(req: SmartPrintRequest):
     """Akıllı yazdırma (AI)"""
     try:
         return await get_print_service().print_smart(req)
+    except PrinterError as err:
+        raise printer_error_to_http(err)
+
+
+@router.post(
+    "/aco",
+    response_model=JobResponse,
+    dependencies=[Depends(verify_token)],
+    summary="ACO Recycling Ödül Fişi Yazdır",
+    description="""
+ACO Recycling geri dönüşüm makinesi için standart ödül fişi yazdırır.
+
+## Fiş İçeriği
+- **Başlık**: ACO RECYCLING logosu (büyük font)
+- **Makine Bilgisi**: MachineID ve UTC zaman damgası
+- **Ödül Miktarı**: Büyük ve kalın font (TL/EUR/USD/GBP)
+- **Ürün Tablosu**: Cam, Plastik, Metal, Tetrapak adet ve puan
+- **QR Kod**: Büyük QR kodu (URL veya veri)
+
+## Dil Desteği
+`language` parametresi ile tüm etiketler çevrilir:
+- `tr`: Türkçe (Cam, Plastik, Metal, Tetrapak, Ödül...)
+- `en`: English (Glass, Plastic, Metal, Tetrapak, Reward...)
+- `de`: Deutsch (Glas, Plastik, Metall, Tetrapak, Belohnung...)
+- `fr`: Français (Verre, Plastique, Métal, Tetrapak, Récompense...)
+    """,
+    response_description="ACO fişi başarıyla yazdırıldı",
+    responses={
+        200: {
+            "description": "Fiş yazdırma başarılı",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "job_id": "aco-001",
+                        "status": "done",
+                        "message": "ACO receipt printed successfully.",
+                        "timestamp": "2026-05-27T00:00:00Z"
+                    }
+                }
+            }
+        }
+    }
+)
+async def print_aco(req: AcoReceiptRequest):
+    """ACO Recycling ödül fişi yazdır"""
+    try:
+        return await get_print_service().print_aco(req)
     except PrinterError as err:
         raise printer_error_to_http(err)

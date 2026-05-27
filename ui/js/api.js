@@ -121,6 +121,10 @@ class API {
     return this.request('POST', '/print/smart', data);
   }
 
+  async printAco(data) {
+    return this.request('POST', '/print/aco', data);
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // LOGS
   // ═══════════════════════════════════════════════════════════════════════════

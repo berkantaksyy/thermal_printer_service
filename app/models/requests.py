@@ -132,6 +132,39 @@ class SmartPrintRequest(BaseModel):
     }}
 
 
+class AcoReceiptRequest(BaseModel):
+    """ACO Recycling ödül fişi isteği"""
+    job_id: Optional[str] = Field(None, description="İş kimliği (idempotency için)")
+    machine_id: str = Field(description="Makine kimliği", example="ACO-TEST-0001-0001")
+    reward: float = Field(description="Ödül miktarı", ge=0, example=3.00)
+    currency: str = Field("TL", description="Para birimi (TL, EUR, USD, GBP)", max_length=4)
+    glass: int = Field(0, ge=0, description="Cam adet sayısı")
+    plastic: int = Field(0, ge=0, description="Plastik adet sayısı")
+    metal: int = Field(0, ge=0, description="Metal adet sayısı")
+    tetrapak: int = Field(0, ge=0, description="Tetrapak adet sayısı")
+    qr_data: str = Field(description="QR kodda saklanacak veri (URL vb.)", min_length=1, max_length=2048)
+    template_name: Optional[str] = Field(None, description="Fiş şablon adı")
+    language: Optional[str] = Field(None, description="Dil kodu (tr/en/de/fr)")
+    cut: bool = Field(True, description="Otomatik kağıt kesme")
+
+    model_config = {"json_schema_extra": {
+        "examples": [{
+            "job_id": "aco-001",
+            "machine_id": "ACO-TEST-0001-0001",
+            "reward": 3.00,
+            "currency": "TL",
+            "glass": 0,
+            "plastic": 2,
+            "metal": 1,
+            "tetrapak": 0,
+            "qr_data": "https://acorecycling.com/receipt/aco-001",
+            "template_name": "Aco Recycling Default Reward",
+            "language": "en",
+            "cut": True
+        }]
+    }}
+
+
 class ReprintRequest(BaseModel):
     """Yeniden yazdırma isteği"""
     job_id: str = Field(description="Yeniden yazdırılacak iş kimliği")

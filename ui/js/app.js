@@ -117,6 +117,12 @@ class PrinterApp {
       printSmartBtn.addEventListener('click', () => this.handlePrintSmart());
     }
 
+    // ACO Recycling
+    const printAcoBtn = document.getElementById('printAcoBtn');
+    if (printAcoBtn) {
+      printAcoBtn.addEventListener('click', () => this.handlePrintAco());
+    }
+
     // Log butonları
     const refreshLogsBtn = document.getElementById('refreshLogsBtn');
     const exportLogsBtn = document.getElementById('exportLogsBtn');
@@ -552,6 +558,74 @@ class PrinterApp {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // PRINT - ACO RECYCLING
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async handlePrintAco() {
+    const btn = document.getElementById('printAcoBtn');
+    const jobId = document.getElementById('acoJobId')?.value || undefined;
+    const machineId = document.getElementById('acoMachineId')?.value;
+    const reward = parseFloat(document.getElementById('acoReward')?.value || '0');
+    const currency = document.getElementById('acoCurrency')?.value || 'TL';
+    const glass = parseInt(document.getElementById('acoGlass')?.value || '0');
+    const plastic = parseInt(document.getElementById('acoPlastic')?.value || '0');
+    const metal = parseInt(document.getElementById('acoMetal')?.value || '0');
+    const tetrapak = parseInt(document.getElementById('acoTetrapak')?.value || '0');
+    const qrData = document.getElementById('acoQrData')?.value;
+    const templateName = document.getElementById('acoTemplateName')?.value || undefined;
+    const autoCut = document.getElementById('acoAutoCut')?.checked !== false;
+
+    if (!machineId || machineId.trim() === '') {
+      ui.warning('Lütfen Makine ID girin');
+      return;
+    }
+    if (!qrData || qrData.trim() === '') {
+      ui.warning('Lütfen QR kod verisini girin');
+      return;
+    }
+
+    try {
+      ui.setButtonLoading(btn, true);
+
+      const data = {
+        machine_id: machineId,
+        reward,
+        currency,
+        glass,
+        plastic,
+        metal,
+        tetrapak,
+        qr_data: qrData,
+        cut: autoCut,
+        language: this.getPrinterLanguage(),
+      };
+      if (jobId) data.job_id = jobId;
+      if (templateName) data.template_name = templateName;
+
+      const result = await api.printAco(data);
+      ui.success(`♻️ ${result.message} (${result.job_id})`);
+
+      // ACO önizlemesini göster
+      this.showAcoReceiptPreview({
+        machineId,
+        reward,
+        currency,
+        glass, plastic, metal, tetrapak,
+        qrData,
+        templateName: templateName || 'Aco Recycling Default Reward',
+        jobId: result.job_id,
+      });
+
+      setTimeout(() => this.loadLogs(), 1000);
+
+    } catch (error) {
+      ui.error(error instanceof APIError ? error.getUserMessage() : error.message);
+    } finally {
+      ui.setButtonLoading(btn, false);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // RECEIPT PREVIEW
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -731,6 +805,140 @@ class PrinterApp {
     }
 
     // Smooth scroll to preview
+    setTimeout(() => {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  /**
+   * ACO Recycling fişi önizlemesi
+   */
+  showAcoReceiptPreview({ machineId, reward, currency, glass, plastic, metal, tetrapak, qrData, templateName, jobId }) {
+    const section = document.getElementById('previewSection');
+    const body = document.getElementById('receiptBody');
+    const meta = document.getElementById('receiptMeta');
+    if (!section || !body) return;
+
+    section.style.display = '';
+    body.innerHTML = '';
+
+    const CURRENCY_SYMBOLS = { TL: '₺', EUR: '€', USD: '$', GBP: '£' };
+    const sym = CURRENCY_SYMBOLS[currency] || currency;
+    const now = new Date().toLocaleString('tr-TR');
+
+    // Language labels
+    const lang = this.getPrinterLanguage();
+    const LABELS = {
+      tr: { product: 'Ürün', quantity: 'Miktar', reward: 'Puan', glass: 'Cam', plastic: 'Plastik', metal: 'Metal', tetrapak: 'Tetrapak', rewardLabel: 'Ödül' },
+      en: { product: 'Product', quantity: 'Quantity', reward: 'Reward', glass: 'Glass', plastic: 'Plastic', metal: 'Metal', tetrapak: 'Tetrapak', rewardLabel: 'Reward' },
+      de: { product: 'Produkt', quantity: 'Menge', reward: 'Punkte', glass: 'Glas', plastic: 'Plastik', metal: 'Metall', tetrapak: 'Tetrapak', rewardLabel: 'Belohnung' },
+      fr: { product: 'Produit', quantity: 'Quantité', reward: 'Points', glass: 'Verre', plastic: 'Plastique', metal: 'Métal', tetrapak: 'Tetrapak', rewardLabel: 'Récompense' },
+    };
+    const L = LABELS[lang] || LABELS['en'];
+
+    // ── Header ────────────────────────────────────────────────────────────
+    const logoDiv = document.createElement('div');
+    logoDiv.style.cssText = 'text-align:center; padding: 6px 0 2px;';
+    logoDiv.innerHTML = `
+      <div style="font-size:18px; font-weight:900; letter-spacing:1px; color:#111;">
+        ♻️ ACO RECYCLING
+      </div>
+      <div style="font-size:10px; color:#555; margin-top:1px;">reverse vending recycling systems</div>
+    `;
+    body.appendChild(logoDiv);
+
+    const hr0 = document.createElement('hr');
+    hr0.className = 'receipt-divider';
+    body.appendChild(hr0);
+
+    // ── Machine info ──────────────────────────────────────────────────────
+    const machineDiv = document.createElement('div');
+    machineDiv.style.cssText = 'text-align:center; font-size:11px; line-height:1.6;';
+    machineDiv.innerHTML = `
+      <strong>MachineID: ${machineId}</strong><br>
+      ${now}<br>
+      <span style="color:#555;">${templateName}</span>
+    `;
+    body.appendChild(machineDiv);
+
+    const hr1 = document.createElement('hr');
+    hr1.className = 'receipt-divider';
+    body.appendChild(hr1);
+
+    // ── Reward amount ─────────────────────────────────────────────────────
+    const rewardDiv = document.createElement('div');
+    rewardDiv.style.cssText = 'text-align:center; font-size:22px; font-weight:900; padding: 6px 0;';
+    rewardDiv.textContent = `${L.rewardLabel}: ${reward.toFixed(2)} ${sym}`;
+    body.appendChild(rewardDiv);
+
+    const hr2 = document.createElement('hr');
+    hr2.className = 'receipt-divider';
+    body.appendChild(hr2);
+
+    // ── Product table ─────────────────────────────────────────────────────
+    const table = document.createElement('table');
+    table.style.cssText = 'width:100%; border-collapse:collapse; font-size:11px;';
+
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr style="border-bottom:1px solid #ccc;">
+        <th style="text-align:left; padding:2px 0; font-weight:700;">${L.product}</th>
+        <th style="text-align:center; font-weight:700;">${L.quantity}</th>
+        <th style="text-align:right; font-weight:700;">${L.reward}</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    const rows = [
+      [L.glass, glass, glass],
+      [L.plastic, plastic, plastic],
+      [L.metal, metal, metal],
+      [L.tetrapak, tetrapak, tetrapak],
+    ];
+    rows.forEach(([name, qty, pts]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="text-align:left; padding:2px 0;">${name}</td>
+        <td style="text-align:center;">${qty}</td>
+        <td style="text-align:right;">${pts}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    body.appendChild(table);
+
+    const hr3 = document.createElement('hr');
+    hr3.className = 'receipt-divider';
+    body.appendChild(hr3);
+
+    // ── QR code ───────────────────────────────────────────────────────────
+    const qrArea = document.createElement('div');
+    qrArea.className = 'receipt-qr-area';
+    body.appendChild(qrArea);
+
+    if (window.QRCode && qrData) {
+      try {
+        new QRCode(qrArea, {
+          text: qrData,
+          width: 140,
+          height: 140,
+          colorDark: '#000',
+          colorLight: '#fff',
+          correctLevel: QRCode.CorrectLevel.M,
+        });
+      } catch (e) {
+        qrArea.textContent = `[QR: ${qrData}]`;
+      }
+    }
+
+    const ts = document.createElement('div');
+    ts.className = 'receipt-timestamp';
+    ts.textContent = now;
+    body.appendChild(ts);
+
+    if (meta) meta.textContent = `İş ID: ${jobId || '—'}  |  Makine: ${machineId}`;
+
     setTimeout(() => {
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
