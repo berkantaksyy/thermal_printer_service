@@ -378,12 +378,55 @@ thermal_printer_service/
 
 ## Running Tests
 
+### Unit Tests (pytest)
+
 ```bash
 pip install -r requirements.txt
 pytest -v
 ```
 
 Expected output: all tests pass (no physical printer required — tests use a mock).
+
+### Integration Tests (Sahte Yazıcı ile)
+
+Gerçek yazıcı donanımı olmadan sistemi test etmek için sahte yazıcı simülatörü kullanabilirsiniz:
+
+```bash
+# 1. Sahte yazıcıyı başlat (Terminal 1)
+cd test_fake_printer
+python3 fake_printer.py --mode parse
+
+# 2. .env dosyasını güncelle (Terminal 2)
+cat > .env << EOF
+DEFAULT_CONNECTION_TYPE=lan
+LAN_HOST=127.0.0.1
+LAN_PORT=9100
+API_BEARER_TOKEN=change-me-secret-token
+EOF
+
+# 3. API servisini başlat (Terminal 3)
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# 4. Test et (Terminal 4)
+curl -X POST http://localhost:8000/print/text \
+  -H "Authorization: Bearer change-me-secret-token" \
+  -H "Content-Type: application/json" \
+  -d '{"lines": [{"text": "Test"}], "cut": true}'
+```
+
+**Hızlı Başlangıç:**
+```bash
+cd test_fake_printer
+./quick_start.sh
+```
+
+**Otomatik Test Scriptleri:**
+```bash
+cd test_fake_printer
+./run_all_tests.sh
+```
+
+Detaylı kullanım için: [`test_fake_printer/README.md`](test_fake_printer/README.md)
 
 ---
 
