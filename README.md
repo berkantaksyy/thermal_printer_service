@@ -45,7 +45,7 @@ FastAPI (Python) ile geliştirilmiştir.
 
 ### 🖥️ Sahte Yazıcı Terminal
 
-![Fake Printer Terminal](docs/screenshots/09-fake-printer-terminal.png)
+<img src="docs/screenshots/09-fake-printer-terminal.png" width="600"/>
 
 ---
 
