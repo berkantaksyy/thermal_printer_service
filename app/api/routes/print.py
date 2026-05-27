@@ -254,8 +254,9 @@ Bu özellik varsayılan olarak **kapalıdır**. Aktif etmek için `.env` dosyas�
 
 ```env
 LLM_ENABLED=true
-OPENROUTER_API_KEY=sk-or-...
-OPENROUTER_MODEL=mistralai/mistral-7b-instruct:free
+GROQ_API_KEY=gsk_your_api_key_here
+GROQ_MODEL=openai/gpt-oss-120b
+GROQ_BASE_URL=https://api.groq.com/openai/v1
 ```
 
 ## Önemli Notlar

@@ -1013,8 +1013,8 @@ class PrinterApp {
       tr.style.cssText = idx % 2 === 0 ? 'background:#fff;' : 'background:#f8fdf8;';
       tr.innerHTML = `
         <td style="text-align:left; padding:4px 3px;">${icon} ${name}</td>
-        <td style="text-align:center; color:#333;">${qty}</td>
-        <td style="text-align:right; padding:4px 3px; font-weight:600; color:#27ae60;">${pts}</td>
+        <td style="text-align:center; color:#000;">${qty}</td>
+        <td style="text-align:right; padding:4px 3px; font-weight:700; color:#27ae60;">${pts}</td>
       `;
       tbody.appendChild(tr);
     });
