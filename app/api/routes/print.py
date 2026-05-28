@@ -260,10 +260,10 @@ GROQ_BASE_URL=https://api.groq.com/openai/v1
 ```
 
 ## Önemli Notlar
-- Bu özellik dış API servisi kullanır (OpenRouter)
-- API anahtarı gerektirir
+- Bu özellik dış API servisi kullanır (**Groq** — OpenAI-uyumlu endpoint)
+- Ücretsiz API anahtarı gerektirir ([console.groq.com](https://console.groq.com))
 - İnternet bağlantısı gereklidir
-- LLM devre dışıysa basit anahtar-değer formatında yazdırır
+- LLM devre dışıysa serbest metin parçalara bölünüp doğrudan yazdırılır
 
 ## Dil Desteği
 `language` parametresi ile çıktı dilini belirleyebilirsiniz:
