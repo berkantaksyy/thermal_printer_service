@@ -53,3 +53,5 @@ data/failed_jobs/
 # OS
 .DS_Store
 Thumbs.db
+
+plans/
